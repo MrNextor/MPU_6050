@@ -1,0 +1,70 @@
+=========================
+** Возможно объединить считывание данных с гироскопа и акселерометра
+
+4.4 Конфигурация гироскопа
+
+Необходимые регистры
+- 4.27 Регистр 106 - Контроль пользователя USER_CTRL
+Состояние буфера FIFO не изменяется, если MPU-60X0 в циклическом режиме. ЧТО ЭТО
+При сбросе только пути прохождения сигнала (а не регистров датчика) используйте
+регистр 104, SIGNAL_PATH_RESET. ЧТО ЭТО
+    Включить FIFO
+    _100_000 
+    Сбросить FIFO
+    _000_100
+    
+  
+
+Неизвестно понадобятся ли
+- 4.14 Register 55 – INT Pin / Bypass Enable Configuration (INT_PIN_CFG)
+- 4.15 Register 56 – Interrupt Enable (INT_ENABLE)
+- 4.16 Register 58 – Interrupt Status (INT_STATUS)
+
+- 4.26 Регистр 104 - сброс пути сигнала
+
+- 4.28 Регистр 107 - Управление питанием 1
+- 4.29 Регистр 108 - Управление питанием 2
+- 4.31 Регистр 116 - FIFO Чтение Запись
+
+Ненужные регистры
+- 4.7 Register 36 (8'h24) - I2C Master Control (I2C_MST_CTRL)
+- 4.8 Регистры с 37 по 39 - I2C Slave 0 Control
+- 4.9 Регистры с 40 по 42 - I2C Slave 1 Control
+- 4.10 Регистры с 43 по 45 - I2C Slave 2 Control
+- 4.11 Регистры с 46 по 48 - I2C Slave 3 Control
+- 4.12 Регистры с 49 по 53 - I2C Slave 4 Control
+- 4.13 Register 54 – I2C Master Status (I2C_MST_STATUS)
+
+- 4.20 Регистры с 73 по 96 - данные внешнего датчика
+- 4.21 Регистр 99 - I2C Slave 0 Data Out
+- 4.22 Регистр 100 - выход I2C Slave 1
+- 4.23 Регистр 101 - I2C Slave 2 Data Out
+- 4.24 Регистр 102 - I2C Slave 3 Data Out
+- 4.25 Регистр 103 - I2C Master Delay Control
+
+
+
+
+Implemented
+- 4.6 Register 35 (8'h23) – FIFO Enable (FIFO_EN)
+    Enable FIFO for temperature, gyroscope and accelerometer
+    TEMP_FIFO_EN[7] - set 1
+    XG_ FIFO_EN[6] - set 1
+    YG_ FIFO_EN[5] - set 1
+    ZG_ FIFO_EN[4] - set 1
+    ACCEL_ FIFO_EN[3] - set 1
+    bits[2:0] - set 0
+- 4.17 Registers 59 to 64 (8'h3B to 8'h40) – Accelerometer Measurements (ACCEL_XOUT_H, ACCEL_XOUT_L, ACCEL_YOUT_H, ACCEL_YOUT_L, ACCEL_ZOUT_H, and ACCEL_ZOUT_L)
+- 4.18 Registers 65 and 66 (8'h41, 8'h42) - Temperature Measurement (TEMP_OUT_H and TEMP_OUT_L)
+    Calculation not implemented:
+    Temperature in degrees C = (TEMP_OUT Register Value as a signed quantity)/340 + 36.53
+- 4.19 Registers 67 to 72 (8'h43 to 8'h48) – Gyroscope Measurements (GYRO_XOUT_H, GYRO_XOUT_L, GYRO_YOUT_H, GYRO_YOUT_L, GYRO_ZOUT_H, and GYRO_ZOUT_L)
+- 4.30 Register 114 and 115 (8'h72, 8'h73) – FIFO Count Registers (FIFO_COUNT_H and FIFO_COUNT_L)
+- 4.32 Register 117 (8'h75) - WHO_AM_I
+
+    
+Выборка датчиков производится с частотой дискретизации, определенной в Регистре 25.  
+
+
+Попробовать осуществить 16 битную комманду, содержащую в себе адрес регистра и записываемое в него значение
+
