@@ -19,6 +19,7 @@
 *.do
 *.bak[1-9]
 *.bak[10]
+*wlf
 *.vo
 *.sft
 *.xrf
