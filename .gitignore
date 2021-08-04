@@ -19,7 +19,8 @@
 *.do
 *.bak[1-9]
 *.bak[10]
-*wlf
+wlf
+wlftwqg7mn
 *.vo
 *.sft
 *.xrf
@@ -44,3 +45,4 @@
 /incremental_db/
 /output_files/
 rtl_work/
+/simulation/modelsim/*wlf
