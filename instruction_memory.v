@@ -5,6 +5,7 @@ module instruction_memory
      O_DATA_ROM_A, O_DATA_ROM_B, O_ADDR_ROM_A, O_ADDR_ROM_B);
     
     
+//--------------------------------------------------------------------------     
 //  input signals    
     input wire                    CLK;        // clock 50 MHz
     input wire [ADDR_ROM_SZ-1:0]  I_ADDR_ROM_A; // word A addr in ROM
