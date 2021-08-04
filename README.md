@@ -26,7 +26,7 @@ Description O_DATA_ROM_B:
 Register map: 4.18 Registers 65 and 66 (8'h41, 8'h42) - Temperature Measurement (TEMP_OUT_H and TEMP_OUT_L)  
     Calculation not implemented:  
     Temperature in degrees C = (TEMP_OUT Register Value as a signed quantity)/340 + 36.53  
-R type: I_INSTR: 8'h10
+R type: I_INSTR: 8'h10  
 Signals instruction_memory.v:
 - Input signals:
     - I_ADDR_ROM_A: 4'h1;
