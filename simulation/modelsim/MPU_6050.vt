@@ -1,105 +1,117 @@
-// command MPU_6050
-    `define CHECK     4'b0001 // check chip id MPU_6050
-    `define TMP_MSR   4'b0010 // measurement temperature    
-    `define ACCEL_MSR 4'b0011 // accelerometer Measurements 
-    `define GYRO_MSR  4'b0100 // gyroscope measurements     
-    `define FIFO_EN   4'b0101 // FIFO Enable for temp, gyro and accel 
-    `define FIFO_CNT  4'b0110 // keep track of the number of samples currently in the FIFO buffer    
-    
+    `define TMP_MSR   8'h10 // measurement temperature
+    `define CHECK     8'h32 // check WHO_AM_I
+    `define GYRO_MSR  8'h54 // gyroscope measurements
+    `define ACCEL_MSR 8'h76 // accelerometer measurements
+    `define FIFO_EN   8'h98 // FIFO enable
+
 `timescale 10 ns/ 1 ns
 module MPU_6050_vlg_tst();
-    parameter FPGA_CLK             = 50_000_000;           // FPGA frequency 50 MHz
-    parameter I2C_CLK              = 400_000;              // I2C bus frequency 400 KHz     
-    parameter ADDR_I2C_SZ          = 7;                    // addr on I2C bus width
-    parameter DATA_I2C_SZ          = 8;                    // data on I2C bus width 
-    parameter DATA_ROM_SZ          = 8;                    // word width in ROM    
-    parameter ADDR_ROM_SZ          = 4;                    // addr width in ROM 
-    parameter ADDR_OPM_SZ          = 4;                    // addr width in RAM 
-    parameter DATA_OPM_SZ          = 16;                   // word width in RAM
-    parameter FL_SZ                = 8;                    // command execution flag width
-    // parameter DATA_ALU             = 32;                   // data ALU width
-    // parameter DATA_DIV             = 33;                   // data div width 
+    parameter FPGA_CLK             = 50_000_000; // FPGA frequency 50 MHz
+    parameter I2C_CLK              = 400_000;    // I2C bus frequency 400 KHz     
+    parameter ADDR_I2C_SZ          = 7;          // addr on I2C bus width
+    parameter DATA_I2C_SZ          = 8;          // data on I2C bus width 
+    parameter DATA_ROM_SZ          = 16;         // word width in ROM    
+    parameter ADDR_ROM_SZ          = 4;          // addr width in ROM 
+    parameter FL_SZ                = 2;          // command execution flag width
+/*
+    parameter ADDR_OPM_SZ          = 4;          // addr width in RAM 
+    parameter DATA_OPM_SZ          = 16;         // word width in RAM
+    parameter DATA_ALU             = 32;         // data ALU width
+    parameter DATA_DIV             = 33;         // data div width 
+*/    
 // --------------------------------------------------------------------------     
-    reg                        CLK;             // clock 50 MHz
-    reg                        RST_n;           // asynchronous reset_n
-    reg [ADDR_ROM_SZ-1:0]      I_COMM;          // command for MPU_6050  
-    wire [ADDR_ROM_SZ-1:0]     addr_rom_o;      // word address in ROM     
-    wire [DATA_ROM_SZ-1:0]     data_rom;        // word in ROM
-    wire                       en_i2c;          // enable I2C bus  
-    wire [ADDR_I2C_SZ-1:0]     addr_i2c;        // addr on I2C bus
-    wire                       rw;              // RW I2C bus 
-    wire [DATA_I2C_SZ-1:0]     data_wr_i2c;     // data for writing on I2C bus     
-    wire                       IO_SCL;          // serial clock I2C bus 
-    wire                       IO_SDA;          // serial data I2C bus    
-    wire                       busy_i2c;        // master I2C busy signal
-    wire [DATA_I2C_SZ-1:0]     data_rd_i2c;     // readed data from I2C bus
-    wire [23:0]                rxd_buff;        // buffer of received data from MPU_6050 
-    wire signed [DATA_OPM_SZ-1:0]        t_buff;           // readed TEMP_OUT
-    wire signed [DATA_OPM_SZ-1:0] accel_x_buff;   // readed ACCEL_XOUT
-    wire signed [DATA_OPM_SZ-1:0] accel_y_buff;   // readed ACCEL_YOUT
-    wire signed [DATA_OPM_SZ-1:0] accel_z_buff;   // readed ACCEL_ZOUT    
+    reg                     CLK;             // clock 50 MHz
+    reg                     RST_n;           // asynchronous reset_n
+    reg                     I_EN;            // enable Controller
+    reg [ADDR_ROM_SZ*2-1:0] I_INSTR;         // command for MPU_6050  
+    wire [DATA_ROM_SZ-1:0]  data_rom_a;      // word A in ROM
+    wire [DATA_ROM_SZ-1:0]  data_rom_b;      // word B in ROM    
+    wire [ADDR_ROM_SZ-1:0]  addr_rom_a_out;  // word A addr in ROM
+    wire [ADDR_ROM_SZ-1:0]  addr_rom_b_out;  // word B addr in ROM  
+    wire                    en_i2c;          // enable I2C bus  
+    wire [ADDR_I2C_SZ-1:0]  addr_i2c;        // addr on I2C bus
+    wire                    rw;              // RW I2C bus 
+    wire [DATA_I2C_SZ-1:0]  data_wr_i2c;     // data for writing on I2C bus     
+    wire                    IO_SCL;          // serial clock I2C bus 
+    wire                    IO_SDA;          // serial data I2C bus    
+    wire                    busy_i2c;        // master I2C busy signal
+    wire [DATA_I2C_SZ-1:0]  data_rd_i2c;     // readed data from I2C bus
+    wire [23:0]             rxd_buff;        // buffer of received data from MPU_6050 
+/*    
+    wire signed [DATA_OPM_SZ-1:0] t_buff;        // readed TEMP_OUT
+    wire signed [DATA_OPM_SZ-1:0] accel_x_buff;  // readed ACCEL_XOUT
+    wire signed [DATA_OPM_SZ-1:0] accel_y_buff;  // readed ACCEL_YOUT
+    wire signed [DATA_OPM_SZ-1:0] accel_z_buff;  // readed ACCEL_ZOUT    
     wire signed [DATA_OPM_SZ-1:0] gyro_x_buff;   // readed GYRO_XOUT
     wire signed [DATA_OPM_SZ-1:0] gyro_y_buff;   // readed GYRO_YOUT
     wire signed [DATA_OPM_SZ-1:0] gyro_z_buff;   // readed GYRO_ZOUT
-    wire [DATA_OPM_SZ-1:0] fifo_cnt_buff; // current value of the FIFO counter
-    // wire                       we;              // RAM write enable signal
-    // wire [ADDR_OPM_SZ-1:0]     addr_opm;        // word addr in RAM (output) 
-    // wire [DATA_OPM_SZ-1:0]     data_opm;        // word by addr in RAM (output)
-    // wire [DATA_ALU-1:0]        srcA;            // srcA
-    // wire [DATA_ALU-1:0]        srcB;            // srcB    
-    // wire [DATA_ALU-1:0]        rsl_alu;         // result alu
-    // wire                       en_div;          // enable devision
-    // wire [DATA_DIV-1:0]        num;             // numerator
-    // wire [DATA_DIV-1:0]        den;             // denomerator     
-    // wire                       fn_div;          // end of division
-    // wire signed [DATA_DIV-1:0] rsl_div;         // result division        
-    wire [FL_SZ-1:0]           O_FL;            // command execution flag     
-    wire                       O_ERR;           // chip id error (MPU_6050) or error state of FSM
-    wire [4:0]                 O_CNT_RS_ERR;    // counter chip id error (MPU_6050) or error state of FSM 
-    wire                       O_ACK_FL;        // flag in case of error on the bus   
-    wire [4:0]                 O_CNT_RS_ACK_FL; // counter error ACK from MPU_6050
-    reg                        en_sda_slv;      // enable signal to simulate input sda from the slave
-    reg                        sda_slv;         // input sda from the slave
-    reg [DATA_I2C_SZ-1:0]      CC;
-    integer                    k;  
+    wire [DATA_OPM_SZ-1:0]        fifo_cnt_buff; // current value of the FIFO counter
+    wire                          we;            // RAM write enable signal
+    wire [ADDR_OPM_SZ-1:0]        addr_opm;      // word addr in RAM (output) 
+    wire [DATA_OPM_SZ-1:0]        data_opm;      // word by addr in RAM (output)
+    wire [DATA_ALU-1:0]           srcA;          // srcA
+    wire [DATA_ALU-1:0]           srcB;          // srcB    
+    wire [DATA_ALU-1:0]           rsl_alu;       // result alu
+    wire                          en_div;        // enable devision
+    wire [DATA_DIV-1:0]           num;           // numerator
+    wire [DATA_DIV-1:0]           den;           // denomerator     
+    wire                          fn_div;        // end of division
+    wire signed [DATA_DIV-1:0]    rsl_div;       // result division   
+    wire [FL_SZ-1:0]              O_FL;          // command execution flag     
+*/    
+    wire [FL_SZ-1:0]        O_FL;            // instruction execution flag 
+    wire                    O_BUSY;          // Busy controller
+    wire                    O_ERR;           // error state of FSM
+    wire [4:0]              O_CNT_RS_ERR;    // counter error state of FSM 
+    wire                    O_ACK_FL;        // flag in case of error on the bus   
+    wire [4:0]              O_CNT_RS_ACK_FL; // counter error ACK from MPU_6050
+    reg                     en_sda_slv;      // enable signal to simulate input sda from the slave
+    reg                     sda_slv;         // input sda from the slave
+    reg [DATA_I2C_SZ-1:0]   CC;
+    integer                 k;  
     
 // --------------------------------------------------------------------------     
     MPU_6050 dut
         (
          .CLK(CLK), 
          .RST_n(RST_n), 
-         .I_COMM(I_COMM),
-         .O_FL(O_FL),
+         .I_EN(I_EN),
+         .I_INSTR(I_INSTR),
          .O_ACK_FL(O_ACK_FL),
          .O_CNT_RS_ACK_FL(O_CNT_RS_ACK_FL),
          .O_ERR(O_ERR),
          .O_CNT_RS_ERR(O_CNT_RS_ERR),
+         .O_BUSY(O_BUSY),
+         .O_FL(O_FL),
          .IO_SCL(IO_SCL), 
          .IO_SDA(IO_SDA)
         );  
 
 // --------------------------------------------------------------------------   
     assign IO_SDA = en_sda_slv ? sda_slv : 1'bz; 
-    // assign num = dut.num;
-    // assign den = dut.den;
-    // assign srcA = dut.srcA;
-    // assign srcB = dut.srcB;
-    // assign en_div = dut.en_div;
-    // assign fn_div = dut.fn_div;
-    // assign rsl_div = dut.rsl_div;
     assign data_rd_i2c = dut.data_rd_i2c;
     assign busy_i2c = dut.busy_i2c;
     assign addr_i2c = dut.addr_i2c;
     assign rw = dut.rw;
     assign data_wr_i2c = dut.data_wr_i2c;
-    // assign we = dut.we;
     assign en_i2c = dut.en_i2c;
-    // assign addr_opm = dut.addr_opm;
-    // assign data_opm = dut.data_opm;    
-    assign addr_rom_o = dut.addr_rom_o;
-    assign data_rom = dut.data_rom;
-    // assign rsl_alu = dut.rsl_alu;
+    assign addr_rom_a_out = dut.addr_rom_a_out;
+    assign addr_rom_b_out = dut.addr_rom_b_out;
+    assign data_rom_a = dut.data_rom_a;
+    assign data_rom_b = dut.data_rom_b;    
     assign rxd_buff = dut.rxd_buff;
+/*    
+    assign num = dut.num;
+    assign den = dut.den;
+    assign srcA = dut.srcA;
+    assign srcB = dut.srcB;
+    assign en_div = dut.en_div;
+    assign fn_div = dut.fn_div;
+    assign rsl_div = dut.rsl_div;
+    assign we = dut.we;
+    assign addr_opm = dut.addr_opm;
+    assign data_opm = dut.data_opm;    
+    assign rsl_alu = dut.rsl_alu;
     assign t_buff = dut.t_buff;
     assign accel_x_buff = dut.accel_x_buff;
     assign accel_y_buff = dut.accel_y_buff;
@@ -108,7 +120,9 @@ module MPU_6050_vlg_tst();
     assign gyro_y_buff = dut.gyro_y_buff;
     assign gyro_z_buff = dut.gyro_z_buff; 
     assign fifo_cnt_buff = dut.fifo_cnt_buff;
-    
+*/    
+
+// --------------------------------------------------------------------------    
     initial begin
       CLK = 1'b1;
       RST_n = 1'b1;
@@ -116,70 +130,71 @@ module MPU_6050_vlg_tst();
 //    start reset
       #1; RST_n = 0;
 //    stop reset
-      #2; RST_n = 1;     
-
-//    start communication check (1)
-      I_COMM = `CHECK; 
-      #2313; en_sda_slv = 1'b1; sda_slv = 1'b0;  // ACK from the slave that received the command  
-      #250; en_sda_slv = 1'b0;         
-      ack_data_ack_comm;                          // ACK from the slave that received bytes, ACK from the slave that received the command  
-      CC = 8'h68; slv_tr_byte;                    // the slave transmits one byte     
-//    stop communication check     
-
-//    start communication check (2)
-      I_COMM = `CHECK;
-      #3000; en_sda_slv = 1'b1; sda_slv = 1'b0;  // ACK from the slave that received the command  
-      #250; en_sda_slv = 1'b0;         
-      ack_data_ack_comm;                          // ACK from the slave that received bytes, ACK from the slave that received the command  
-      CC = 8'h69; slv_tr_byte;                    // the slave transmits one byte     
-//    stop communication check 
-
+      #2; RST_n = 1;  
+      
 //    start reading of temperature
-      I_COMM = `TMP_MSR;
-      #3000; en_sda_slv = 1'b1; sda_slv = 1'b0;  // ACK from the slave that received the command  
+      I_EN = 1'b1;
+      I_INSTR = `TMP_MSR;
+      #2313; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
       #250; en_sda_slv = 1'b0;
       ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
       // temperature reading process, the slave transmits 2 bytes
       CC = 8'hF0; slv_tr_svr_bytes_1;
       CC = 8'hB0; slv_tr_svr_bytes_1;           // -3920
-      en_sda_slv = 1'b0;  
+      en_sda_slv = 1'b0;
 //    stop reading of temperature
 
-//    start reading accelerometer
-      I_COMM = `ACCEL_MSR;
-      #2750; en_sda_slv = 1'b1; sda_slv = 1'b0;  // ACK from the slave that received the command  
-      #250; en_sda_slv = 1'b0;
+//    start communication check (1)
+      I_INSTR = `CHECK; 
+      #2750; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
+      #250; en_sda_slv = 1'b0;         
       ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
-      // accelerometer reading process, the slave transmits 6 bytes
-      repeat (3)
-        begin
-          CC = 8'hF0; slv_tr_svr_bytes_1;
-          CC = 8'hB0; slv_tr_svr_bytes_1;           // -3920
-        end  
-      en_sda_slv = 1'b0;  
-//    stop reading of accelerometer
+      CC = 8'h68; slv_tr_byte;                  // the slave transmits one byte     
+//    stop communication check     
+
+//    start communication check (2)
+      I_INSTR = `CHECK;
+      #3000; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
+      #250; en_sda_slv = 1'b0;         
+      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
+      CC = 8'h69; slv_tr_byte;                  // the slave transmits one byte     
+//    stop communication check 
 
 //    start reading gyroscope
-      I_COMM = `GYRO_MSR;
-      #2750; en_sda_slv = 1'b1; sda_slv = 1'b0;  // ACK from the slave that received the command  
+      I_INSTR = `GYRO_MSR;
+      #3000; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
       #250; en_sda_slv = 1'b0;
       ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
       // gyroscope reading process, the slave transmits 6 bytes
       repeat (3)
         begin
           CC = 8'hF0; slv_tr_svr_bytes_1;
-          CC = 8'hB0; slv_tr_svr_bytes_1;           // -3920
+          CC = 8'hB0; slv_tr_svr_bytes_1;       // -3920
         end  
       en_sda_slv = 1'b0;  
 //    stop reading of gyroscope
 
-//    start FIFO Enable
-      I_COMM = `FIFO_EN;
-      ack_two_ack;
-//    stop FIFO Enable      
+//    start reading accelerometer
+      I_INSTR = `ACCEL_MSR;
+      #2750; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
+      #250; en_sda_slv = 1'b0;
+      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
+      // accelerometer reading process, the slave transmits 6 bytes
+      repeat (3)
+        begin
+          CC = 8'hF0; slv_tr_svr_bytes_1;
+          CC = 8'hB0; slv_tr_svr_bytes_1;       // -3920
+        end  
+      en_sda_slv = 1'b0;  
+//    stop reading of accelerometer
 
+//    start FIFO Enable
+      I_INSTR = `FIFO_EN;
+      ack_two_ack;
+//    stop FIFO Enable
+/*
 //    start reading of FIFO cnt 
-      I_COMM = `FIFO_CNT;
+      I_INSTR = `FIFO_CNT;
       #2750; en_sda_slv = 1'b1; sda_slv = 1'b0;  // ACK from the slave that received the command  
       #250; en_sda_slv = 1'b0;
       ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
@@ -188,18 +203,20 @@ module MPU_6050_vlg_tst();
       CC = 8'hB0; slv_tr_svr_bytes_1;           // -3920
       en_sda_slv = 1'b0;  
 //    stop reading of FIFO cnt e
-      
-      I_COMM = 4'h0; // waiting for command 
+*/      
+// waiting for command       
+      I_EN = 1'b0;
+      I_INSTR = 8'h0; 
     end   
-    
-    always #1 CLK = ~CLK;
-    
-    // initial begin
-      // $dumpvars;
-    // end
 
-    initial 
-    #100000 $finish;
+// --------------------------------------------------------------------------    
+    always #1 CLK = ~CLK;
+ 
+// -------------------------------------------------------------------------- 
+    initial begin
+      // $dumpvars;
+      #100000 $finish;
+    end
     
 //  ACK from the slave that received bytes, ACK from the slave that received the command    
     task automatic ack_data_ack_comm; 
