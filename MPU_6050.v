@@ -2,7 +2,7 @@ module MPU_6050
     #(parameter FPGA_CLK = 50_000_000, // FPGA frequency 50 MHz
       parameter I2C_CLK  = 400_000)    // I2C bus frequency 400 KHz     
     (CLK, RST_n, I_EN, I_INSTR, 
-     O_ACK_FL, O_CNT_RS_ACK_FL, O_ERR, O_CNT_RS_ERR, O_BUSY, O_FL,
+     O_ACK_FL, O_CNT_RS_ACK_FL, O_ERR, O_CNT_RS_ERR, O_BUSY, O_FL, rxd_buff,
      IO_SCL, IO_SDA);
 
 
@@ -13,7 +13,7 @@ module MPU_6050
     localparam ADDR_ROM_SZ = 4;  // addr width in ROM 
     localparam DATA_ROM_SZ = 16; // word width in ROM 
     localparam RXD_SZ      = 24; // buffer of received data from MPU_6050 (width)
-    localparam FL_SZ       = 2;  // instruction execution flag width  
+    localparam FL_SZ       = 2;  // instruction execution flag width
 /*    
     localparam ADDR_OPM_SZ = 4;                             // addr width in RAM 
     localparam DATA_OPM_SZ          = 16;                   // word width in RAM
@@ -34,6 +34,7 @@ module MPU_6050
     output wire [4:0]       O_CNT_RS_ERR;    // counter error state of FSM 
     output wire             O_BUSY;          // Busy controller
     output wire [FL_SZ-1:0] O_FL;            // instruction execution flag 
+    output wire [RXD_SZ-1:0]        rxd_buff;       // buffer of received data from MPU_6050 
 //  bidirectional signals
     inout wire IO_SCL; // serial clock I2C bus 
     inout wire IO_SDA; // serial data I2C bus    
@@ -50,7 +51,7 @@ module MPU_6050
     wire                     rs_ack_fl;      // rising edge ACK from MPU_6050
     reg [4:0]                cnt_rs_ack_fl;  // counter error ACK from MPU_6050
     wire [ADDR_ROM_SZ*2-1:0] instr;          // instruction for MPU_6050 
-    wire [RXD_SZ-1:0]        rxd_buff;       // buffer of received data from MPU_6050 
+    // wire [RXD_SZ-1:0]        rxd_buff;       // buffer of received data from MPU_6050 
     wire                     err;            // error state of FSM
     reg                      cr_err;         // current error state of FSM
     reg                      pr_err;         // previous error state of FSM
@@ -127,7 +128,7 @@ module MPU_6050
          .O_RXD_BUFF(rxd_buff),
          .O_BUSY(O_BUSY),
          .O_ERR(err),
-         .O_FL(O_FL)         
+         .O_FL(O_FL)
 /*
          .O_EN_RAM(en_ram),
          .O_WE(we_ctrl),
