@@ -85,7 +85,7 @@ Signals instruction_memory.v:
     - O_DATA_ROM_A: *16'hD1_00 (16'b110_1000_1_0000_0000)*;
     - O_DATA_ROM_B: *16'h3B_60 (16'b0011_0101_0110_0000)*. 
 #### Temperature Measurement
-R type: ***I_INSTR: 8'h09 ***  
+R type: ***I_INSTR: 8'h09***  
 Register map: 4.18 Registers 65 and 66 (8'h41, 8'h42) - Temperature Measurement (TEMP_OUT_H and TEMP_OUT_L)  
     Calculation not implemented:  
     Temperature in degrees C = (TEMP_OUT Register Value as a signed quantity)/340 + 36.53  
@@ -108,12 +108,13 @@ Signals instruction_memory.v:
     - O_DATA_ROM_B: *16'h43_60 (16'b0100_0011_0110_0000)*. 
 #### User Control
 W type  
-Register map: 4.27 Register 106 (8'h6A) – User Control (USER_CTRL)
+Register map: 4.27 Register 106 (8'h6A) – User Control (USER_CTRL)  
 Setting USER_CTRL:
 - *FIFO_EN[6]*: set 1 for enables FIFO op, 0 for disable FIFO op;
 - *I2C_MST_EN[5], I2C_IF_DIS[4]*: set 0;
 - *FIFO_RESET[2], I2C_MST_RESET[1], SIG_COND_RESET[0]*: set 0;
 - *bits [7], [3]*: not user.
+
 ***I_INSTR: 8'hBC*** Enables FIFO operations.  
 Signals instruction_memory.v:
 - Input signals:
