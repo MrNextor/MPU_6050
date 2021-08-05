@@ -9,15 +9,15 @@ The instruction is 32 bits in size:
 
 Description O_DATA_ROM_A:
 - MSB byte:
-    - bits[15:9]: slave address on the I2C bus;
-    - bit[8]: R/W.
+    - *bits[15:9]*: slave address on the I2C bus;
+    - *bit[8]*: R/W.
 - LSB byte: data to write.
 
 Description O_DATA_ROM_B:
 - MSB byte: slave register address;
 - LSB byte:
-    - bits[7:4]: number of bytes to read/write;
-    - bits[3:0]: 4'h0.
+    - *bits[7:4]*: number of bytes to read/write;
+    - *bits[3:0]*: 4'h0.
 ### Implemented instructions
 
 #### Gyroscope and accelerometer configuration
@@ -27,7 +27,8 @@ Register map:
 2. 4.5 Register 28 (8'h1C) – Accelerometer Configuration (ACCEL_CONFIG)
 
 Implemented 4 configurations:
-1. ***I_INSTR: 8'h12***. Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g.  
+1. ***I_INSTR: 8'h12***.  
+    Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g.  
     Signals instruction_memory.v:
     - Input signals:
         - I_ADDR_ROM_A: *4'h1*;
@@ -35,7 +36,8 @@ Implemented 4 configurations:
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_00 (16'b110_1000_0_0000_0000)*;
         - O_DATA_ROM_B: *16'h1B_20 (16'b0001_1011_0010_0000)*.
-2. ***I_INSTR: 8'h32***. Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g.  
+2. ***I_INSTR: 8'h32***.  
+    Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g.  
     Signals instruction_memory.v:
     - Input signals:
         - I_ADDR_ROM_A: *4'h3*;
@@ -43,7 +45,8 @@ Implemented 4 configurations:
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_08 (16'b110_1000_0_0000_1000)*;
         - O_DATA_ROM_B: *16'h1B_20 (16'b0001_1011_0010_0000)*. 
-3. ***I_INSTR: 8'h42***. Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g.  
+3. ***I_INSTR: 8'h42***.  
+    Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g.  
     Signals instruction_memory.v:
     - Input signals:
         - I_ADDR_ROM_A: *4'h4*;
@@ -51,7 +54,8 @@ Implemented 4 configurations:
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_10 (16'b110_1000_0_0001_0000)*;
         - O_DATA_ROM_B: *16'h1B_20 (16'b0001_1011_0010_0000)*.   
-4. ***I_INSTR: 8'h52***. Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g.  
+4. ***I_INSTR: 8'h52***.  
+    Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g.  
     Signals instruction_memory.v:
     - Input signals:
         - I_ADDR_ROM_A: *4'h5*;
