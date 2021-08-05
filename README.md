@@ -72,7 +72,7 @@ Signals instruction_memory.v:
     - I_ADDR_ROM_B: 4'h7.
 - Output signals:
     - O_DATA_ROM_A: 16'hD0_F8 (16'b110_1000_0_1111_1000);
-    - O_DATA_ROM_B: 16'h23_10 (16'b0010_0011_0000_0000).
+    - O_DATA_ROM_B: 16'h23_10 (16'b0010_0011_0001_0000).
 #### Accelerometer Measurements
 Register map: 4.17 Registers 59 to 64 (8'h3B to 8'h40) – Accelerometer Measurements (ACCEL_XOUT_H, ACCEL_XOUT_L, ACCEL_YOUT_H, ACCEL_YOUT_L, ACCEL_ZOUT_H, and ACCEL_ZOUT_L)  
 R type: I_INSTR: 8'h08  
@@ -82,7 +82,7 @@ Signals instruction_memory.v:
     - I_ADDR_ROM_B: 4'h8.
 - Output signals:
     - O_DATA_ROM_A: 16'hD1_00 (16'b110_1000_1_0000_0000);
-    - O_DATA_ROM_B: 16'h3B_60 (16'b0011_0101_0001_0000). 
+    - O_DATA_ROM_B: 16'h3B_60 (16'b0011_0101_0110_0000). 
 #### Temperature Measurement
 Register map: 4.18 Registers 65 and 66 (8'h41, 8'h42) - Temperature Measurement (TEMP_OUT_H and TEMP_OUT_L)  
     Calculation not implemented:  
@@ -104,14 +104,49 @@ Signals instruction_memory.v:
     - I_ADDR_ROM_B: 4'hA.
 - Output signals:
     - O_DATA_ROM_A: 16'hD1_00 (16'b110_1000_1_0000_0000);
-    - O_DATA_ROM_B: 16'h43_60 (16'b0100_0011_0001_0000). 
-#### Communication check  - WHO_AM_I
-Register map: 4.32 Register 117 (8'h75) - WHO_AM_I  
-R type: I_INSTR: 8'h0B  
+    - O_DATA_ROM_B: 16'h43_60 (16'b0100_0011_0110_0000). 
+#### User Control
+Register map: 4.27 Register 106 (8'h6A) – User Control (USER_CTRL)
+Setting USER_CTRL:
+- FIFO_EN[6]: set 1 for enables FIFO op, 0 for disable FIFO op;
+- I2C_MST_EN[5], I2C_IF_DIS[4]: set 0;
+- FIFO_RESET[2], I2C_MST_RESET[1], SIG_COND_RESET[0]: set 0;
+- bits [7], [3]: not user.
+Enables FIFO operations.  
+W type : I_INSTR: 8'hBC
+Signals instruction_memory.v:
+- Input signals:
+    - I_ADDR_ROM_A: 4'hB;
+    - I_ADDR_ROM_B: 4'hC.
+- Output signals:
+    - O_DATA_ROM_A: 16'hD0_40 (16'b110_1000_0_0100_0000);
+    - O_DATA_ROM_B: 16'h6A_10 (16'b0110_1010_0001_0000).
+Disable FIFO operations.  
+W type : I_INSTR: 8'hDC
+Signals instruction_memory.v:
+- Input signals:
+    - I_ADDR_ROM_A: 4'hD;
+    - I_ADDR_ROM_B: 4'hC.
+- Output signals:
+    - O_DATA_ROM_A: 16'hD0_04 (16'b110_1000_0_0000_0100);
+    - O_DATA_ROM_B: 16'h6A_10 (16'b0110_1010_0001_0000)    
+#### FIFO Count Registers
+Register map: 4.30 Register 114 and 115 (8'h72 and 8'h73) – FIFO Count Registers (FIFO_COUNT_H and FIFO_COUNT_L)
+R type: I_INSTR: 8'h0E
 Signals instruction_memory.v:
 - Input signals:
     - I_ADDR_ROM_A: 4'h0;
-    - I_ADDR_ROM_B: 4'hB.
+    - I_ADDR_ROM_B: 4'hE.
+- Output signals:
+    - O_DATA_ROM_A: 16'hD1_00 (16'b110_1000_1_0000_0000);
+    - O_DATA_ROM_B: 16'h72_20 (16'b0111_0010_0010_0000).
+#### Communication check  - WHO_AM_I
+Register map: 4.32 Register 117 (8'h75) - WHO_AM_I  
+R type: I_INSTR: 8'h0F  
+Signals instruction_memory.v:
+- Input signals:
+    - I_ADDR_ROM_A: 4'h0;
+    - I_ADDR_ROM_B: 4'hF.
 - Output signals:
     - O_DATA_ROM_A: 16'hD1_00 (16'b110_1000_1_0000_0000);
     - O_DATA_ROM_B: 16'h75_10 (16'b0111_0101_0001_0000).
