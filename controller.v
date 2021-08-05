@@ -36,7 +36,7 @@ module controller
     output reg [RXD_SZ-1:0]      O_RXD_BUFF;    // buffer of received data from I2C bus
     output reg                   O_BUSY;        // Busy controller
     output reg [FL_SZ-1:0]       O_FL;          // command execution flag     
-    output reg                   O_ERR;         // error state of FSM    
+    output reg                   O_ERR;         // error state of FSM
 //  internal signals
     reg [ST_SZ-1:0]         st;               // current state of FSM
     reg [ST_SZ-1:0]         nx_st;            // next state of FSM
@@ -134,13 +134,9 @@ module controller
                                  nx_o_rxd_buff = {O_RXD_BUFF[15:0], I_DATA_RD_I2C};
                                end
                              if (rs_i_busy)
-                               begin
                                  nx_cnt_rs_i_busy = cnt_rs_i_busy - 1'b1;
-                               end
                              if (&(!cnt_rs_i_busy))                       // when = 0
-                               begin
                                  nx_o_en_i2c = 1'b0;                      // stop of a transaction on the bus I2C 
-                               end                               
                              if (&(!cnt_fl_i_busy))                       // when = 0
                                begin
                                  nx_o_fl[0] = 1'b0;                       // finish state of reading
@@ -153,10 +149,10 @@ module controller
                                  nx_cnt_rs_i_busy = cnt_rs_i_busy - 1'b1;
                                  nx_o_data_wr_i2c = slv_reg_data;          
                                end
+                             if (fl_i_busy)
+                                 nx_cnt_fl_i_busy = cnt_fl_i_busy - 1'b1;
                              if (&(!cnt_rs_i_busy))                       // when = 0
-                               begin
                                  nx_o_en_i2c = 1'b0;
-                               end                               
                              if (&(!cnt_fl_i_busy))                       // when = 0
                                begin
                                  nx_o_fl[1] = 1'b0;                       // finish state of writing
