@@ -93,23 +93,25 @@ module controller
                                begin
                                  nx_addr_i2c = I_DATA_ROM_A[15:9];
                                  nx_rw = I_DATA_ROM_A[8];
-                                 nx_slv_reg_addr = I_DATA_ROM_A[7:0];
-                                 nx_slv_reg_data = I_DATA_ROM_B[15:8];
-                                 nx_cnt_rs_i_busy = I_DATA_ROM_B[7:4];
-                                 nx_cnt_fl_i_busy = I_DATA_ROM_B[7:4];
+                                 nx_slv_reg_data = I_DATA_ROM_A[7:0];
+                                 nx_slv_reg_addr = I_DATA_ROM_B[15:8];
                                  nx_o_en_i2c = 1'b1;                   // start of a transaction on the I2C bus 
                                  nx_o_addr_i2c = I_DATA_ROM_A[15:9];   // setting slave addr on the I2C bus
                                  nx_o_rw = 1'b0;                       // write
                                  nx_o_busy = 1'b1;
-                                 nx_o_data_wr_i2c = I_DATA_ROM_A[7:0];
+                                 nx_o_data_wr_i2c = I_DATA_ROM_B[15:8];
                                  nx_o_err = 1'b0;
                                  if (!I_DATA_ROM_A[8])
                                    begin
+                                     nx_cnt_rs_i_busy = I_DATA_ROM_B[7:4] + 1'b1;
+                                     nx_cnt_fl_i_busy = I_DATA_ROM_B[7:4] + 1'b1;
                                      nx_o_fl[1] = 1'b1;                // to start state of reading
                                      nx_st = WR_I2C;
                                    end
                                  else
                                    begin
+                                     nx_cnt_rs_i_busy = I_DATA_ROM_B[7:4];
+                                     nx_cnt_fl_i_busy = I_DATA_ROM_B[7:4];
                                      nx_o_fl[0] = 1'b1;                // to start state of writing
                                      nx_st = RD_I2C_ST;
                                    end                                  
