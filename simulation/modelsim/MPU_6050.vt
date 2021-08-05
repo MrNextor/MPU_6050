@@ -1,14 +1,14 @@
-    `define TMP_MSR   8'h10  // measurement temperature
-    `define CHECK     8'h32  // check WHO_AM_I
-    `define GYRO_MSR  8'h54  // gyroscope measurements
-    `define ACCEL_MSR 8'h76  // accelerometer measurements
-    `define FIFO_EN   8'h98  // FIFO enable for temperature, gyroscope and accelerometer
-    `define G_A_CONF_0 8'hBA // Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g
-    `define G_A_CONF_1 8'hBC // Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g 
-    `define G_A_CONF_2 8'hBD // Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g 
-    `define G_A_CONF_3 8'hBE // Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g
+    `define G_A_CONF_0 8'h12 // Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g
+    `define G_A_CONF_1 8'h32 // Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g 
+    `define G_A_CONF_2 8'h42 // Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g 
+    `define G_A_CONF_3 8'h52 // Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g
+    `define FIFO_EN    8'h67 // FIFO enable for temperature, gyroscope and accelerometer
+    `define ACCEL_MSR  8'h08 // accelerometer measurements
+    `define TMP_MSR    8'h09 // measurement temperature
+    `define GYRO_MSR   8'h0A // gyroscope measurements
+    `define CHECK      8'h0B // check WHO_AM_I
     
-
+    
 `timescale 10 ns/ 1 ns
 module MPU_6050_vlg_tst();
     parameter FPGA_CLK             = 50_000_000; // FPGA frequency 50 MHz
@@ -136,52 +136,11 @@ module MPU_6050_vlg_tst();
       #1; RST_n = 0;
 //    stop reset
       #2; RST_n = 1;  
-      
-//    start reading of temperature
       I_EN = 1'b1;
-      I_INSTR = `TMP_MSR;
-      #2313; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
-      #250; en_sda_slv = 1'b0;
-      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
-      // temperature reading process, the slave transmits 2 bytes
-      CC = 8'hF0; slv_tr_svr_bytes_1;
-      CC = 8'hB0; slv_tr_svr_bytes_1;           // -3920
-      en_sda_slv = 1'b0;
-//    stop reading of temperature
-
-//    start communication check (1)
-      I_INSTR = `CHECK; 
-      #2750; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
-      #250; en_sda_slv = 1'b0;         
-      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
-      CC = 8'h68; slv_tr_byte;                  // the slave transmits one byte     
-//    stop communication check     
-
-//    start communication check (2)
-      I_INSTR = `CHECK;
-      #3000; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
-      #250; en_sda_slv = 1'b0;         
-      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
-      CC = 8'h69; slv_tr_byte;                  // the slave transmits one byte     
-//    stop communication check 
-
-//    start reading gyroscope
-      I_INSTR = `GYRO_MSR;
-      #3000; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
-      #250; en_sda_slv = 1'b0;
-      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
-      // gyroscope reading process, the slave transmits 6 bytes
-      repeat (3)
-        begin
-          CC = 8'hF0; slv_tr_svr_bytes_1;
-          CC = 8'hB0; slv_tr_svr_bytes_1;       // -3920
-        end  
-      en_sda_slv = 1'b0;  
-//    stop reading of gyroscope
-
+      
 //    start reading accelerometer
       I_INSTR = `ACCEL_MSR;
-      #2750; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
+      #2313; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
       #250; en_sda_slv = 1'b0;
       ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
       // accelerometer reading process, the slave transmits 6 bytes
@@ -192,11 +151,6 @@ module MPU_6050_vlg_tst();
         end  
       en_sda_slv = 1'b0;  
 //    stop reading of accelerometer
-
-//    start FIFO Enable
-      I_INSTR = `FIFO_EN;
-      num_acks(2);
-//    stop FIFO Enable
 
 //    start G_A_CONF_0
       I_INSTR = `G_A_CONF_0;
@@ -217,6 +171,53 @@ module MPU_6050_vlg_tst();
       I_INSTR = `G_A_CONF_3;
       num_acks(3);
 //    stop G_A_CONF_3
+
+//    start FIFO Enable
+      I_INSTR = `FIFO_EN;
+      num_acks(2);
+//    stop FIFO Enable
+
+//    start reading of temperature
+      I_EN = 1'b1;
+      I_INSTR = `TMP_MSR;
+      #2750; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
+      #250; en_sda_slv = 1'b0;
+      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
+      // temperature reading process, the slave transmits 2 bytes
+      CC = 8'hF0; slv_tr_svr_bytes_1;
+      CC = 8'hB0; slv_tr_svr_bytes_1;           // -3920
+      en_sda_slv = 1'b0;
+//    stop reading of temperature
+
+//    start reading gyroscope
+      I_INSTR = `GYRO_MSR;
+      #2750; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
+      #250; en_sda_slv = 1'b0;
+      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
+      // gyroscope reading process, the slave transmits 6 bytes
+      repeat (3)
+        begin
+          CC = 8'hF0; slv_tr_svr_bytes_1;
+          CC = 8'hB0; slv_tr_svr_bytes_1;       // -3920
+        end  
+      en_sda_slv = 1'b0;  
+//    stop reading of gyroscope
+
+//    start communication check (1)
+      I_INSTR = `CHECK; 
+      #2750; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
+      #250; en_sda_slv = 1'b0;         
+      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
+      CC = 8'h68; slv_tr_byte;                  // the slave transmits one byte     
+//    stop communication check     
+
+//    start communication check (2)
+      I_INSTR = `CHECK;
+      #3000; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
+      #250; en_sda_slv = 1'b0;         
+      ack_data_ack_comm;                        // ACK from the slave that received bytes, ACK from the slave that received the command  
+      CC = 8'h69; slv_tr_byte;                  // the slave transmits one byte     
+//    stop communication check 
 
 /*
 //    start reading of FIFO cnt 
