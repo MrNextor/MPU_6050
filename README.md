@@ -1,15 +1,18 @@
 ### Description of instructions
 Implemented two types of instructions:
 - R type: reading data from a slave device;
-- W type: writing data to a slave device.  
+- W type: writing data to a slave device.
+
 The instruction is 32 bits in size:
 - MSB 2 bytes: output O_DATA_ROM_A;
-- LSB 2 bytes: output O_DATA_ROM_B.  
+- LSB 2 bytes: output O_DATA_ROM_B.
+
 Description O_DATA_ROM_A:
 - MSB byte:
     - bits[15:9]: slave address on the I2C bus;
     - bit[8]: R/W.
-- LSB byte: data to write.  
+- LSB byte: data to write.
+
 Description O_DATA_ROM_B:
 - MSB byte: slave register address;
 - LSB byte:
@@ -66,7 +69,8 @@ Setting FIFO_EN:
 - *YG_FIFO_EN[5]*: set 1;
 - *ZG_FIFO_EN[4]*: set 1;
 - *ACCEL_FIFO_EN[3]*: set 1;
-- *bits[2:0]*: set 0.  
+- *bits[2:0]*: set 0.
+
 Signals instruction_memory.v:
 - Input signals:
     - I_ADDR_ROM_A: *4'h6*;
@@ -115,22 +119,22 @@ Setting USER_CTRL:
 - *FIFO_RESET[2], I2C_MST_RESET[1], SIG_COND_RESET[0]*: set 0;
 - *bits [7], [3]*: not user.
 
-***I_INSTR: 8'hBC*** Enables FIFO operations.  
-Signals instruction_memory.v:
-- Input signals:
-    - I_ADDR_ROM_A: *4'hB*;
-    - I_ADDR_ROM_B: *4'hC*.
-- Output signals:
-    - O_DATA_ROM_A: *16'hD0_40 (16'b110_1000_0_0100_0000)*;
-    - O_DATA_ROM_B: *16'h6A_10 (16'b0110_1010_0001_0000)*.  
-***I_INSTR: 8'hDC*** Disable FIFO operations.  
-Signals instruction_memory.v:
-- Input signals:
-    - I_ADDR_ROM_A: *4'hD*;
-    - I_ADDR_ROM_B: *4'hC*.
-- Output signals:
-    - O_DATA_ROM_A: *16'hD0_04 (16'b110_1000_0_0000_0100)*;
-    - O_DATA_ROM_B: *16'h6A_10 (16'b0110_1010_0001_0000)*    
+1. ***I_INSTR: 8'hBC*** Enables FIFO operations.  
+    Signals instruction_memory.v:
+    - Input signals:
+        - I_ADDR_ROM_A: *4'hB*;
+        - I_ADDR_ROM_B: *4'hC*.
+    - Output signals:
+        - O_DATA_ROM_A: *16'hD0_40 (16'b110_1000_0_0100_0000)*;
+        - O_DATA_ROM_B: *16'h6A_10 (16'b0110_1010_0001_0000)*.
+2. ***I_INSTR: 8'hDC*** Disable FIFO operations.  
+    Signals instruction_memory.v:
+    - Input signals:
+        - I_ADDR_ROM_A: *4'hD*;
+        - I_ADDR_ROM_B: *4'hC*.
+    - Output signals:
+        - O_DATA_ROM_A: *16'hD0_04 (16'b110_1000_0_0000_0100)*;
+        - O_DATA_ROM_B: *16'h6A_10 (16'b0110_1010_0001_0000)*.
 #### FIFO Count Registers
 R type: ***I_INSTR: 8'h0E***  
 Register map: 4.30 Register 114 and 115 (8'h72 and 8'h73) – FIFO Count Registers (FIFO_COUNT_H and FIFO_COUNT_L)  
