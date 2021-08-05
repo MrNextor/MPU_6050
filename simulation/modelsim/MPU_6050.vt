@@ -1,8 +1,13 @@
-    `define TMP_MSR   8'h10 // measurement temperature
-    `define CHECK     8'h32 // check WHO_AM_I
-    `define GYRO_MSR  8'h54 // gyroscope measurements
-    `define ACCEL_MSR 8'h76 // accelerometer measurements
-    `define FIFO_EN   8'h98 // FIFO enable
+    `define TMP_MSR   8'h10  // measurement temperature
+    `define CHECK     8'h32  // check WHO_AM_I
+    `define GYRO_MSR  8'h54  // gyroscope measurements
+    `define ACCEL_MSR 8'h76  // accelerometer measurements
+    `define FIFO_EN   8'h98  // FIFO enable for temperature, gyroscope and accelerometer
+    `define G_A_CONF_0 8'hBA // Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g
+    `define G_A_CONF_1 8'hBC // Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g 
+    `define G_A_CONF_2 8'hBD // Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g 
+    `define G_A_CONF_3 8'hBE // Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g
+    
 
 `timescale 10 ns/ 1 ns
 module MPU_6050_vlg_tst();
@@ -190,8 +195,29 @@ module MPU_6050_vlg_tst();
 
 //    start FIFO Enable
       I_INSTR = `FIFO_EN;
-      ack_two_ack;
+      num_acks(2);
 //    stop FIFO Enable
+
+//    start G_A_CONF_0
+      I_INSTR = `G_A_CONF_0;
+      num_acks(3);
+//    stop G_A_CONF_0
+
+//    start G_A_CONF_1
+      I_INSTR = `G_A_CONF_1;
+      num_acks(3);
+//    stop G_A_CONF_1
+
+//    start G_A_CONF_2
+      I_INSTR = `G_A_CONF_2;
+      num_acks(3);
+//    stop G_A_CONF_2
+
+//    start G_A_CONF_3
+      I_INSTR = `G_A_CONF_3;
+      num_acks(3);
+//    stop G_A_CONF_3
+
 /*
 //    start reading of FIFO cnt 
       I_INSTR = `FIFO_CNT;
@@ -215,7 +241,7 @@ module MPU_6050_vlg_tst();
 // -------------------------------------------------------------------------- 
     initial begin
       // $dumpvars;
-      #100000 $finish;
+      #140000 $finish;
     end
     
 //  ACK from the slave that received bytes, ACK from the slave that received the command    
@@ -228,12 +254,13 @@ module MPU_6050_vlg_tst();
       end
     endtask
     
-//  ACK from the slave that received the command, two ACK from the slave that received two bytes
-    task automatic ack_two_ack; 
+//  number of ACKS from the slave
+    task automatic num_acks;
+      input [3:0] ack;
       begin
           #2750; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command
           #250; en_sda_slv = 1'b0;  
-          repeat (2) //  two ACK from the slave that received two bytes 
+          repeat (ack) //  number received of ASCS from the slave
             begin
               #2000; en_sda_slv = 1'b1; sda_slv = 1'b0; 
               #250; en_sda_slv = 1'b0; 

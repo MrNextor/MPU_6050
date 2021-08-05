@@ -82,3 +82,42 @@ Signals instruction_memory.v:
 - Output signals:
     - O_DATA_ROM_A: 16'hD0_23 (16'b110_1000_0_0010_0011);
     - O_DATA_ROM_B: 16'hF8_20 (16'b1111_1000_0000_0000).
+#### Gyroscope and accelerometer configuration
+Register map: 
+1. 4.4 Register 27 (8'h1B) – Gyroscope Configuration (GYRO_CONFIG);
+2. 4.5 Register 28 (8'h1C) – Accelerometer Configuration (ACCEL_CONFIG)  
+R type.  
+Implemented 4 configurations:
+1. I_INSTR: 8'hBA. Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g.  
+    Signals instruction_memory.v:
+    - Input signals:
+        - I_ADDR_ROM_A: 4'hB;
+        - I_ADDR_ROM_B: 4'hA.
+    - Output signals:
+        - O_DATA_ROM_A: 16'hD0_1B (16'b110_1000_0_0001_1011);
+        - O_DATA_ROM_B: 16'h00_30 (16'b0000_0000_0011_0000).
+2. I_INSTR: 8'hBC. Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g.  
+    Signals instruction_memory.v:
+    - Input signals:
+        - I_ADDR_ROM_A: 4'hB;
+        - I_ADDR_ROM_B: 4'hC.
+    - Output signals:
+        - O_DATA_ROM_A: 16'hD0_1B (16'b110_1000_0_0001_1011);
+        - O_DATA_ROM_B: 16'h08_30 (16'b0000_1000_0011_0000). 
+3. I_INSTR: 8'hBD. Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g.  
+    Signals instruction_memory.v:
+    - Input signals:
+        - I_ADDR_ROM_A: 4'hB;
+        - I_ADDR_ROM_B: 4'hD.
+    - Output signals:
+        - O_DATA_ROM_A: 16'hD0_1B (16'b110_1000_0_0001_1011);
+        - O_DATA_ROM_B: 16'h10_30 (16'b0001_0000_0011_0000).    
+4. I_INSTR: 8'hBE. Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g.  
+    Signals instruction_memory.v:
+    - Input signals:
+        - I_ADDR_ROM_A: 4'hB;
+        - I_ADDR_ROM_B: 4'hE.
+    - Output signals:
+        - O_DATA_ROM_A: 16'hD0_1B (16'b110_1000_0_0001_1011);
+        - O_DATA_ROM_B: 16'h18_30 (16'b0001_1000_0011_0000).
+        
