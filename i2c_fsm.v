@@ -42,7 +42,9 @@ module i2c_fsm
     reg [ST_SZ-1:0]           st;              // current state of FSM 
     reg [ST_SZ-1:0]           nx_st;           // next state of FSM 
     reg [COMM_SZ-1:0]         comm_slv;        // latched address and read/write
-    reg [COMM_SZ-1:0]         nx_comm_slv;     // next latched address and read/write      
+    reg [COMM_SZ-1:0]         nx_comm_slv;     // next latched address and read/write 
+    reg [COMM_SZ-1:0]         sh_reg;          // shift reg
+    reg [COMM_SZ-1:0]         nx_sh_reg;       // shift reg
     reg [DATA_SZ-1:0]         data_wr;         // latched data for writing to slave
     reg [DATA_SZ-1:0]         nx_data_wr;      // next latched data for writing to slave 
     reg                       data_o_sda;      // data for SDA transmitting 
@@ -66,6 +68,7 @@ module i2c_fsm
       nx_data_o_sda = O_SDA;
       nx_st = st;
       nx_comm_slv = comm_slv;
+      nx_sh_reg = sh_reg;
       nx_data_wr = data_wr;  
       nx_o_data_rd = O_DATA_RD;
       nx_cnt_bit_comm = cnt_bit_comm;
@@ -79,29 +82,28 @@ module i2c_fsm
             case (st)    
                 IDLE     : begin 
                              nx_o_busy = 1'b0;
-                             nx_comm_slv = {ADDR_SZ{1'b0}};
-                             nx_data_wr = {DATA_SZ{1'b0}};
                              nx_cnt_bit_comm = COMM_SZ - 1'b1;
                              nx_cnt_bit_data = DATA_SZ - 1'b1;
-                             nx_buff_rd = {DATA_SZ{1'b0}};                                       
                              if (I_EN)
                                  begin
                                    nx_o_busy = 1'b1;
                                    nx_o_ack_fl = 1'b0;
                                    nx_comm_slv = {I_ADDR, I_RW};
+                                   nx_sh_reg = {I_ADDR, I_RW};
                                    nx_data_wr = I_DATA_WR;
-                                   nx_o_data_rd = {DATA_SZ{1'b0}};
                                    nx_st = START;
                                 end
                            end
                 START    : begin   
-                             nx_st = COMM_SLV;
-                             nx_data_o_sda = comm_slv[COMM_SZ-1];
+                             nx_data_o_sda = sh_reg[COMM_SZ-1];
+                             nx_sh_reg = {sh_reg[COMM_SZ-2:0], 1'b0};
                              nx_o_busy = 1'b1;
+                             nx_st = COMM_SLV;
                            end
                 COMM_SLV : begin  
                              nx_cnt_bit_comm = cnt_bit_comm - 1'b1;
-                             nx_data_o_sda = comm_slv[cnt_bit_comm-1];
+                             nx_sh_reg = {sh_reg[COMM_SZ-2:0], 1'b0};
+                             nx_data_o_sda = sh_reg[COMM_SZ-1];
                              if (&(!cnt_bit_comm))
                                begin
                                  nx_cnt_bit_comm = COMM_SZ - 1'b1;
@@ -112,24 +114,26 @@ module i2c_fsm
                 ACK_COMM : begin
                              if (!comm_slv[0])
                                begin
+                                 nx_data_o_sda = data_wr[DATA_SZ-1];
+                                 nx_data_wr = {data_wr[DATA_SZ-2:0], 1'b0};
                                  nx_st = WR;
-                                 nx_data_o_sda = data_wr[DATA_SZ-1]; 
                                end
                              else
                                begin
-                                 nx_st = RD;
                                  nx_data_o_sda = 1'b1;
+                                 nx_st = RD;
                                end   
                            end
                 WR       : begin
                              nx_o_busy = 1'b1;                    
                              nx_cnt_bit_data = cnt_bit_data - 1'b1;
-                             nx_data_o_sda = data_wr[cnt_bit_data-1];
+                             nx_data_wr = {data_wr[DATA_SZ-2:0], 1'b0};
+                             nx_data_o_sda = data_wr[DATA_SZ-1];
                              if (&(!cnt_bit_data))
                                begin
                                  nx_cnt_bit_data = DATA_SZ - 1'b1;
-                                 nx_st = ACK_DATA;
                                  nx_data_o_sda = 1'b1;                        
+                                 nx_st = ACK_DATA;
                                end
                            end
                 ACK_DATA : begin
@@ -137,7 +141,8 @@ module i2c_fsm
                                begin
                                  nx_o_busy = 1'b0;
                                  nx_comm_slv = {I_ADDR, I_RW};
-                                 nx_data_wr = I_DATA_WR;
+                                 nx_sh_reg = {I_ADDR, I_RW};
+                                 nx_data_wr = {I_DATA_WR[DATA_SZ-2:0], 1'b0};
                                  if (comm_slv == {I_ADDR, I_RW})
                                    begin
                                      nx_data_o_sda = I_DATA_WR[DATA_SZ-1];
@@ -145,26 +150,26 @@ module i2c_fsm
                                    end
                                  else
                                    begin
-                                     nx_st = STOP;
                                      nx_data_o_sda = 1'b0;                                               
+                                     nx_st = STOP;
                                    end  
                                end
                              else
                                begin
-                                 nx_st = STOP;
                                  nx_data_o_sda = 1'b0;                   
+                                 nx_st = STOP;
                                end
                            end
                 STOP     : begin
                              if (I_EN)
                                begin
-                                 nx_st = START;
                                  nx_o_busy = 1'b1;
+                                 nx_st = START;
                                end
                              else
                                begin  
-                                 nx_st = IDLE;
                                  nx_o_busy = 1'b0;
+                                 nx_st = IDLE;
                                end
                            end
                 RD       : begin
@@ -187,27 +192,29 @@ module i2c_fsm
                                  nx_o_busy = 1'b0;
                                  nx_comm_slv = {I_ADDR, I_RW};
                                  nx_data_wr = I_DATA_WR;
+                                 nx_sh_reg = {I_ADDR, I_RW};
                                  if (comm_slv == {I_ADDR, I_RW})
                                    begin
-                                     nx_st = RD;
                                      nx_data_o_sda = 1'b1;
+                                     nx_st = RD;
                                    end
                                  else
                                    begin 
-                                     nx_st = STOP;
                                      nx_data_o_sda = 1'b0;
+                                     nx_st = STOP;
                                    end         
                                end
                              else
                                begin
-                                 nx_st = STOP;
                                  nx_data_o_sda = 1'b0;
+                                 nx_st = STOP;
                                end  
                            end
                 default  : begin
                              nx_st = IDLE;
                              nx_o_busy = 1'b0;
                              nx_comm_slv = {COMM_SZ{1'b0}};
+                             nx_sh_reg = {COMM_SZ{1'b0}};
                              nx_data_wr = {DATA_SZ{1'b0}};
                              nx_data_o_sda = 1'b1;
                              nx_cnt_bit_comm = COMM_SZ - 1'b1;
@@ -235,7 +242,7 @@ module i2c_fsm
                              else
                                nx_o_ack_fl = 1'b0;                 
                            end                  
-                RD       :     nx_buff_rd[cnt_bit_data] = I_SDA;       
+                RD       :     nx_buff_rd = {buff_rd[DATA_SZ-2:0], I_SDA};       
                 STOP     : begin
                              nx_data_o_sda = 1'b1;
                              nx_en_o_scl = 1'b0;
@@ -244,7 +251,7 @@ module i2c_fsm
             endcase
         end     
     end
-            
+
 //  latching the next state of FSM and signals, every clock
     always @(posedge CLK or negedge RST_n) begin
       if (!RST_n) 
@@ -264,6 +271,7 @@ module i2c_fsm
     end
     always @(posedge CLK) begin
       comm_slv     <= nx_comm_slv;
+      sh_reg       <= nx_sh_reg;
       data_wr      <= nx_data_wr;
       cnt_bit_comm <= nx_cnt_bit_comm;
       cnt_bit_data <= nx_cnt_bit_data;
@@ -274,4 +282,4 @@ module i2c_fsm
     end
 
 
-endmodule           
+endmodule
