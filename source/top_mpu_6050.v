@@ -1,4 +1,4 @@
-module MPU_6050
+module top_mpu_6050
     #(parameter FPGA_CLK = 50_000_000, // FPGA frequency 50 MHz
       parameter I2C_CLK  = 400_000)    // I2C bus frequency 400 KHz     
     (CLK, RST_n, I_EN, I_INSTR, 
@@ -138,12 +138,12 @@ module MPU_6050
         );      
 
 //--------------------------------------------------------------------------       
-   instruction_memory 
+   rom_instr 
         #(
          .ADDR_ROM_SZ(ADDR_ROM_SZ), 
          .DATA_ROM_SZ(DATA_ROM_SZ)
         )
-    instruction_memory
+    rom_instr
         (
          .CLK(CLK), 
          .I_ADDR_ROM_A(addr_rom_a_in), 

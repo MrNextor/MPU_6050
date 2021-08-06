@@ -1,4 +1,4 @@
-module MPU_6050_DEBUG
+module db_mpu_6050
     #(parameter FPGA_CLK = 50_000_000, // FPGA frequency 50 MHz
       parameter I2C_CLK  = 400_000)    // I2C bus frequency 400 KHz  
     (CLK, I_KEY, I_SW, 
@@ -24,12 +24,12 @@ module MPU_6050_DEBUG
     wire [RXD_SZ-1:0]  rxd_buff; // buffer of received data from MPU_6050 
     
 //--------------------------------------------------------------------------
-    MPU_6050 
+    top_mpu_6050 
         #(
          .FPGA_CLK(FPGA_CLK),
          .I2C_CLK(I2C_CLK)
         )
-    MPU_6050 
+    top_mpu_6050 
         (
          .CLK(CLK), 
          .RST_n(RST_n),

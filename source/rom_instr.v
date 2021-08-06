@@ -1,4 +1,4 @@
-module instruction_memory
+module rom_instr
     #(parameter ADDR_ROM_SZ = 4,  // addr width in ROM 
       parameter DATA_ROM_SZ = 16) // word width in ROM
     (CLK, I_ADDR_ROM_A, I_ADDR_ROM_B, 
@@ -26,7 +26,7 @@ module instruction_memory
     
 //  read ROM content from file
     initial begin
-      $readmemh("../instruction_memory.txt", rom_array); 
+      $readmemh("rom_instr.rom", rom_array); 
     end
 
 //  read operation  

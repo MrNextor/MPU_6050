@@ -30,11 +30,11 @@ wlftwqg7mn
 *.sopc_builder
 *.summary
 *.tcl
+!db_mpu_6050.tcl
 *msim_transcript
 *.wlf
-#!BMP180_DEBUG.tcl
 *.txt
-!instruction_memory.txt
+!rom_instr.txt
 *~
 *example*
 *sopc_*
@@ -45,4 +45,4 @@ wlftwqg7mn
 /incremental_db/
 /output_files/
 rtl_work/
-/simulation/modelsim/*wlf
+simulation/

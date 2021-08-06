@@ -13,7 +13,7 @@
     
     
 `timescale 10 ns/ 1 ns
-module MPU_6050_vlg_tst();
+module tb_mpu_6050;
     parameter FPGA_CLK             = 50_000_000; // FPGA frequency 50 MHz
     parameter I2C_CLK              = 400_000;    // I2C bus frequency 400 KHz     
     parameter ADDR_I2C_SZ          = 7;          // addr on I2C bus width
@@ -78,7 +78,7 @@ module MPU_6050_vlg_tst();
     integer                 k;  
     
 // --------------------------------------------------------------------------     
-    MPU_6050 dut
+    top_mpu_6050 dut
         (
          .CLK(CLK), 
          .RST_n(RST_n), 
@@ -149,8 +149,8 @@ module MPU_6050_vlg_tst();
       ack_comm;
       repeat (3)
         begin
-          slv_tx(8'hF0);
-          slv_tx(8'hB0); // -3920     
+          slv_tr_byte(8'hF0);
+          slv_tr_byte(8'hB0); // -3920     
         end  
 
 //    G_A_CONF_0
@@ -183,8 +183,8 @@ module MPU_6050_vlg_tst();
       ack_comm;
       ack_data(1);
       ack_comm;
-      slv_tx(8'hF0);
-      slv_tx(8'hB0); // -3920  
+      slv_tr_byte(8'hF0);
+      slv_tr_byte(8'hB0); // -3920  
 
 //    reading gyroscope
       I_INSTR = `GYRO_MSR;
@@ -193,8 +193,8 @@ module MPU_6050_vlg_tst();
       ack_comm;      
       repeat (3)
         begin
-          slv_tx(8'hF0);
-          slv_tx(8'hB0); // -3920     
+          slv_tr_byte(8'hF0);
+          slv_tr_byte(8'hB0); // -3920     
         end 
 
 //    FIFO Enable
@@ -212,22 +212,22 @@ module MPU_6050_vlg_tst();
       ack_comm;
       ack_data(1);
       ack_comm;
-      slv_tx(8'hF0);
-      slv_tx(8'hB0); // -3920   
+      slv_tr_byte(8'hF0);
+      slv_tr_byte(8'hB0); // -3920   
 
 //    communication check (1)
       I_INSTR = `CHECK; 
       ack_comm;
       ack_data(1);
       ack_comm;
-      slv_tx(8'h68);
+      slv_tr_byte(8'h68);
       
 //    communication check (2)
       I_INSTR = `CHECK; 
       ack_comm;
       ack_data(1);
       ack_comm;
-      slv_tx(8'h69);      
+      slv_tr_byte(8'h69);      
 
 //    waiting for instructions      
       I_EN = 1'b0;
@@ -240,7 +240,7 @@ module MPU_6050_vlg_tst();
 // -------------------------------------------------------------------------- 
     initial begin
       // $dumpvars;
-      #140000 $finish;
+      #152000 $finish;
     end
 
 // --------------------------------------------------------------------------     
@@ -264,7 +264,7 @@ module MPU_6050_vlg_tst();
     endtask
 
 // --------------------------------------------------------------------------        
-    task automatic slv_tx; 
+    task automatic slv_tr_byte; 
       input [7:0] data;
       begin    
           en_sda_slv = 1'b1;
@@ -279,4 +279,4 @@ module MPU_6050_vlg_tst();
     endtask  
     
 
-endmodule    
+endmodule  
