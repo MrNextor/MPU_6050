@@ -30,11 +30,11 @@ wlftwqg7mn
 *.sopc_builder
 *.summary
 *.tcl
+!db_mpu_6050.tcl
 *msim_transcript
 *.wlf
-#!BMP180_DEBUG.tcl
 *.txt
-!instruction_memory.txt
+!rom_instr.txt
 *~
 *example*
 *sopc_*
