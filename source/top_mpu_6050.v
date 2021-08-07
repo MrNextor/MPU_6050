@@ -10,7 +10,7 @@ module top_mpu_6050
     localparam ADDR_I2C_SZ = 7;  // addr on I2C bus width
     localparam COMM_SZ     = 8;  // command widht on I2C bus
     localparam DATA_I2C_SZ = 8;  // data on I2C bus width    
-    localparam ADDR_ROM_SZ = 4;  // addr width in ROM 
+    localparam ADDR_ROM_SZ = 5;  // addr width in ROM 
     localparam DATA_ROM_SZ = 16; // word width in ROM 
     localparam RXD_SZ      = 24; // buffer of received data from MPU_6050 (width)
     localparam FL_SZ       = 2;  // instruction execution flag width
@@ -108,7 +108,7 @@ module top_mpu_6050
          .FPGA_CLK(FPGA_CLK),
          .ADDR_I2C_SZ(ADDR_I2C_SZ),
          .DATA_I2C_SZ(DATA_I2C_SZ),
-         .ADDR_ROM_SZ(ADDR_ROM_SZ),
+         // .ADDR_ROM_SZ(ADDR_ROM_SZ),
          .DATA_ROM_SZ(DATA_ROM_SZ),
          .RXD_SZ(RXD_SZ)
         )     

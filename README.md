@@ -27,44 +27,44 @@ Register map:
 2. 4.5 Register 28 (8'h1C) – Accelerometer Configuration (ACCEL_CONFIG)
 
 Implemented 4 configurations:
-1. ***I_INSTR: 8'h12***.  
+1. ***I_INSTR: 10'h022***.  
     Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g.  
     Signals instruction_memory.v:
     - Input signals:
-        - I_ADDR_ROM_A: *4'h1*;
-        - I_ADDR_ROM_B: *4'h2*.
+        - I_ADDR_ROM_A: *5'h1*;
+        - I_ADDR_ROM_B: *5'h2*.
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_00 (16'b110_1000_0_0000_0000)*;
         - O_DATA_ROM_B: *16'h1B_20 (16'b0001_1011_0010_0000)*.
-2. ***I_INSTR: 8'h32***.  
+2. ***I_INSTR: 10'h062***.  
     Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g.  
     Signals instruction_memory.v:
     - Input signals:
-        - I_ADDR_ROM_A: *4'h3*;
-        - I_ADDR_ROM_B: *4'h2*.
+        - I_ADDR_ROM_A: *5'h3*;
+        - I_ADDR_ROM_B: *5'h2*.
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_08 (16'b110_1000_0_0000_1000)*;
         - O_DATA_ROM_B: *16'h1B_20 (16'b0001_1011_0010_0000)*. 
-3. ***I_INSTR: 8'h42***.  
+3. ***I_INSTR: 10'h082***.  
     Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g.  
     Signals instruction_memory.v:
     - Input signals:
-        - I_ADDR_ROM_A: *4'h4*;
-        - I_ADDR_ROM_B: *4'h2*.
+        - I_ADDR_ROM_A: *5'h4*;
+        - I_ADDR_ROM_B: *5'h2*.
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_10 (16'b110_1000_0_0001_0000)*;
         - O_DATA_ROM_B: *16'h1B_20 (16'b0001_1011_0010_0000)*.   
-4. ***I_INSTR: 8'h52***.  
+4. ***I_INSTR: 10'h0A2***.  
     Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g.  
     Signals instruction_memory.v:
     - Input signals:
-        - I_ADDR_ROM_A: *4'h5*;
-        - I_ADDR_ROM_B: *4'h2*.
+        - I_ADDR_ROM_A: *5'h5*;
+        - I_ADDR_ROM_B: *5'h2*.
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_18 (16'b110_1000_0_0001_1000)*;
         - O_DATA_ROM_B: *16'h1B_20 (16'b0001_1011_0010_0000)*.
 #### FIFO Enable
-W type : ***I_INSTR: 8'h67***  
+W type : ***I_INSTR: 10'h0C7***  
 Register map: 4.6 Register 35 (8'h23) – FIFO Enable (FIFO_EN)  
 FIFO enable for temperature, gyroscope and accelerometer.  
 Setting FIFO_EN:
@@ -77,40 +77,40 @@ Setting FIFO_EN:
 
 Signals instruction_memory.v:
 - Input signals:
-    - I_ADDR_ROM_A: *4'h6*;
-    - I_ADDR_ROM_B: *4'h*7.
+    - I_ADDR_ROM_A: *5'h6*;
+    - I_ADDR_ROM_B: *5'h7*.
 - Output signals:
     - O_DATA_ROM_A: *16'hD0_F8 (16'b110_1000_0_1111_1000)*;
     - O_DATA_ROM_B: *16'h23_10 (16'b0010_0011_0001_0000)*.
 #### Accelerometer Measurements
-R type: ***I_INSTR: 8'h08***  
+R type: ***I_INSTR: 10'h008***  
 Register map: 4.17 Registers 59 to 64 (8'h3B to 8'h40) – Accelerometer Measurements (ACCEL_XOUT_H, ACCEL_XOUT_L, ACCEL_YOUT_H, ACCEL_YOUT_L, ACCEL_ZOUT_H, and ACCEL_ZOUT_L)  
 Signals instruction_memory.v:
 - Input signals:
-    - I_ADDR_ROM_A: *4'h0*;
-    - I_ADDR_ROM_B: *4'h8*.
+    - I_ADDR_ROM_A: *5'h0*;
+    - I_ADDR_ROM_B: *5'h8*.
 - Output signals:
     - O_DATA_ROM_A: *16'hD1_00 (16'b110_1000_1_0000_0000)*;
     - O_DATA_ROM_B: *16'h3B_60 (16'b0011_0101_0110_0000)*. 
 #### Temperature Measurement
-R type: ***I_INSTR: 8'h09***  
+R type: ***I_INSTR: 10'h009***  
 Register map: 4.18 Registers 65 and 66 (8'h41, 8'h42) - Temperature Measurement (TEMP_OUT_H and TEMP_OUT_L)  
     Calculation not implemented:  
     Temperature in degrees C = (TEMP_OUT Register Value as a signed quantity)/340 + 36.53  
 Signals instruction_memory.v:
 - Input signals:
-    - I_ADDR_ROM_A: *4'h0*;
-    - I_ADDR_ROM_B: *4'h9*.
+    - I_ADDR_ROM_A: *5'h0*;
+    - I_ADDR_ROM_B: *5'h9*.
 - Output signals:
     - O_DATA_ROM_A: *16'hD1_00 (16'b110_1000_1_0000_0000)*;
     - O_DATA_ROM_B: *16'h41_20 (16'b0100_0001_0010_0000)*.    
 #### Gyroscope Measurements
-R type: ***I_INSTR: 8'h0A***  
+R type: ***I_INSTR: 10'h00A***  
 Register map: 4.19 Registers 67 to 72 (8'h43 to 8'h48) – Gyroscope Measurements (GYRO_XOUT_H, GYRO_XOUT_L, GYRO_YOUT_H, GYRO_YOUT_L, GYRO_ZOUT_H, and GYRO_ZOUT_L)  
 Signals instruction_memory.v:
 - Input signals:
-    - I_ADDR_ROM_A: *4'h0*;
-    - I_ADDR_ROM_B: *4'hA*.
+    - I_ADDR_ROM_A: *5'h0*;
+    - I_ADDR_ROM_B: *5'hA*.
 - Output signals:
     - O_DATA_ROM_A: *16'hD1_00 (16'b110_1000_1_0000_0000)*;
     - O_DATA_ROM_B: *16'h43_60 (16'b0100_0011_0110_0000)*. 
@@ -123,39 +123,39 @@ Setting USER_CTRL:
 - *FIFO_RESET[2], I2C_MST_RESET[1], SIG_COND_RESET[0]*: set 0;
 - *bits [7], [3]*: not user.
 
-1. ***I_INSTR: 8'hBC*** Enables FIFO operations.  
+1. ***I_INSTR: 10'h16C*** Enables FIFO operations.  
     Signals instruction_memory.v:
     - Input signals:
-        - I_ADDR_ROM_A: *4'hB*;
-        - I_ADDR_ROM_B: *4'hC*.
+        - I_ADDR_ROM_A: *5'hB*;
+        - I_ADDR_ROM_B: *5'hC*.
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_40 (16'b110_1000_0_0100_0000)*;
         - O_DATA_ROM_B: *16'h6A_10 (16'b0110_1010_0001_0000)*.
-2. ***I_INSTR: 8'hDC*** Disable FIFO operations.  
+2. ***I_INSTR: 10'h1AC*** Disable FIFO operations.  
     Signals instruction_memory.v:
     - Input signals:
-        - I_ADDR_ROM_A: *4'hD*;
-        - I_ADDR_ROM_B: *4'hC*.
+        - I_ADDR_ROM_A: *5'hD*;
+        - I_ADDR_ROM_B: *5'hC*.
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_04 (16'b110_1000_0_0000_0100)*;
         - O_DATA_ROM_B: *16'h6A_10 (16'b0110_1010_0001_0000)*.
 #### FIFO Count Registers
-R type: ***I_INSTR: 8'h0E***  
+R type: ***I_INSTR: 10'h00E***  
 Register map: 4.30 Register 114 and 115 (8'h72 and 8'h73) – FIFO Count Registers (FIFO_COUNT_H and FIFO_COUNT_L)  
 Signals instruction_memory.v:
 - Input signals:
-    - I_ADDR_ROM_A: *4'h0*;
-    - I_ADDR_ROM_B: *4'hE*.
+    - I_ADDR_ROM_A: *5'h0*;
+    - I_ADDR_ROM_B: *5'hE*.
 - Output signals:
     - O_DATA_ROM_A: *16'hD1_00 (16'b110_1000_1_0000_0000)*;
     - O_DATA_ROM_B: *16'h72_20 (16'b0111_0010_0010_0000)*.
 #### Communication check  - WHO_AM_I
-R type: ***I_INSTR: 8'h0F***  
+R type: ***I_INSTR: 10'h00F***  
 Register map: 4.32 Register 117 (8'h75) - WHO_AM_I  
 Signals instruction_memory.v:
 - Input signals:
-    - I_ADDR_ROM_A: *4'h0*;
-    - I_ADDR_ROM_B: *4'hF*.
+    - I_ADDR_ROM_A: *5'h0*;
+    - I_ADDR_ROM_B: *5'hF*.
 - Output signals:
     - O_DATA_ROM_A: *16'hD1_00 (16'b110_1000_1_0000_0000)*;
     - O_DATA_ROM_B: *16'h75_10 (16'b0111_0101_0001_0000)*.

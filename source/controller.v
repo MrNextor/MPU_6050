@@ -2,8 +2,8 @@ module controller
     #(parameter FPGA_CLK    = 50_000_000, // FPGA frequency 50 MHz
       parameter ADDR_I2C_SZ = 7,          // addr on I2C bus width
       parameter DATA_I2C_SZ = 8,          // data on I2C bus width
-      parameter ADDR_ROM_SZ = 4,          // addr width in ROM 
       parameter DATA_ROM_SZ = 16,         // word width in ROM 
+      // parameter ADDR_ROM_SZ = 4,          // addr width in ROM 
       // parameter ADDR_OPM_SZ = 4,          // addr width in RAM 
       // parameter DATA_OPM_SZ = 16,         // word width in RAM      
       parameter RXD_SZ      = 24)         // buffer of received data from MPU_6050 (width)
