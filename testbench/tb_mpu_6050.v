@@ -1,15 +1,15 @@
-`define G_A_CONF_0         8'h12 // Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g
-`define G_A_CONF_1         8'h32 // Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g 
-`define G_A_CONF_2         8'h42 // Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g 
-`define G_A_CONF_3         8'h52 // Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g
-`define FIFO_EN            8'h67 // FIFO enable for temperature, gyroscope and accelerometer
-`define ACCEL_MSR          8'h08 // accelerometer measurements
-`define TMP_MSR            8'h09 // measurement temperature
-`define GYRO_MSR           8'h0A // gyroscope measurements
-`define USER_CTRL_EN_FIFO  8'hBC
-`define USER_CTRL_DIS_FIFO 8'hDC
-`define FIFO_COUNT         8'h0E
-`define CHECK              8'h0F // check WHO_AM_I
+`define G_A_CONF_0         10'h022 // Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g
+`define G_A_CONF_1         10'h062 // Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g 
+`define G_A_CONF_2         10'h082 // Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g 
+`define G_A_CONF_3         10'h0A2 // Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g
+`define FIFO_EN            10'h0C7 // FIFO enable for temperature, gyroscope and accelerometer
+`define ACCEL_MSR          10'h008 // accelerometer measurements
+`define TMP_MSR            10'h009 // measurement temperature
+`define GYRO_MSR           10'h00A // gyroscope measurements
+`define USER_CTRL_EN_FIFO  10'h16C
+`define USER_CTRL_DIS_FIFO 10'h1AC
+`define FIFO_COUNT         10'h00E
+`define CHECK              10'h00F // check WHO_AM_I
     
     
 `timescale 10 ns/ 1 ns
@@ -19,7 +19,7 @@ module tb_mpu_6050;
     parameter ADDR_I2C_SZ          = 7;          // addr on I2C bus width
     parameter DATA_I2C_SZ          = 8;          // data on I2C bus width 
     parameter DATA_ROM_SZ          = 16;         // word width in ROM    
-    parameter ADDR_ROM_SZ          = 4;          // addr width in ROM 
+    parameter ADDR_ROM_SZ          = 5;          // addr width in ROM 
     parameter FL_SZ                = 2;          // command execution flag width
 /*
     parameter ADDR_OPM_SZ          = 4;          // addr width in RAM 
@@ -197,7 +197,7 @@ module tb_mpu_6050;
           slv_tr_byte(8'hB0); // -3920     
         end 
 
-//    FIFO Enable
+//    User Control
       I_INSTR = `USER_CTRL_EN_FIFO;
       ack_comm;
       ack_data(2);
