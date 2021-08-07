@@ -15,11 +15,12 @@ module controller
     localparam FL_SZ         = 2; // command execution flag width
     localparam CNT_I_BUSY_SZ = 4; // counter I_BUSY width
 //  description states FSM
-    localparam ST_SZ     = 4;       // number of states FSM
-    localparam IDLE      = 4'b0001; // waiting I_EN
-    localparam RD_I2C_ST = 4'b0010; // start reading data from slave
-    localparam RD_I2C_FN = 4'b0100; // finish reading data from slave
-    localparam WR_I2C    = 4'b1000; // writing data to slave
+    localparam ST_SZ     = 5;        // number of states FSM
+    localparam IDLE      = 5'b00001; // waiting I_EN
+    localparam RD_I2C_ST = 5'b00010; // start reading data from slave
+    localparam RD_I2C_FN = 5'b00100; // finish reading data from slave
+    localparam WR_I2C_ST = 5'b01000; // start writing data to slave
+    localparam WR_I2C_FN = 5'b10000; // finish writing data to slave
 //  input signals
     input wire                   CLK;           // clock 50 MHz
     input wire                   RST_n;         // asynchronous reset_n
@@ -101,17 +102,15 @@ module controller
                                  nx_o_busy = 1'b1;
                                  nx_o_data_wr_i2c = I_DATA_ROM_B[15:8];
                                  nx_o_err = 1'b0;
+                                 nx_cnt_rs_i_busy = I_DATA_ROM_B[7:4];
+                                 nx_cnt_fl_i_busy = I_DATA_ROM_B[7:4];
                                  if (!I_DATA_ROM_A[8])
                                    begin
-                                     nx_cnt_rs_i_busy = I_DATA_ROM_B[7:4] + 1'b1;
-                                     nx_cnt_fl_i_busy = I_DATA_ROM_B[7:4] + 1'b1;
                                      nx_o_fl[1] = 1'b1;                // to start state of reading
-                                     nx_st = WR_I2C;
+                                     nx_st = WR_I2C_ST;
                                    end
                                  else
                                    begin
-                                     nx_cnt_rs_i_busy = I_DATA_ROM_B[7:4];
-                                     nx_cnt_fl_i_busy = I_DATA_ROM_B[7:4];
                                      nx_o_fl[0] = 1'b1;                // to start state of writing
                                      nx_st = RD_I2C_ST;
                                    end                                  
@@ -144,13 +143,16 @@ module controller
                                  nx_o_fl[0] = 1'b0;                       // finish state of reading
                                  nx_st = IDLE;
                                end
-                           end        
-          WR_I2C         : begin
+                           end
+          WR_I2C_ST      : begin
                              if (rs_i_busy)
-                               begin
+                                 nx_o_data_wr_i2c = slv_reg_data;
+                             if (fl_i_busy)
+                                 nx_st = WR_I2C_FN;
+                           end
+          WR_I2C_FN      : begin
+                             if (rs_i_busy)
                                  nx_cnt_rs_i_busy = cnt_rs_i_busy - 1'b1;
-                                 nx_o_data_wr_i2c = slv_reg_data;          
-                               end
                              if (fl_i_busy)
                                  nx_cnt_fl_i_busy = cnt_fl_i_busy - 1'b1;
                              if (&(!cnt_rs_i_busy))                       // when = 0
