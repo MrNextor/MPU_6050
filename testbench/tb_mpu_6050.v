@@ -1,16 +1,4 @@
-`define G_A_CONF_0         10'h022 // Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g
-`define G_A_CONF_1         10'h062 // Full Scale Range: gyroscope - ± 500 °/s, accelerometer - ± 4g 
-`define G_A_CONF_2         10'h082 // Full Scale Range: gyroscope - ± 1000 °/s, accelerometer - ± 8g 
-`define G_A_CONF_3         10'h0A2 // Full Scale Range: gyroscope - ± 2000 °/s, accelerometer - ± 16g
-`define FIFO_EN            10'h0C7 // FIFO enable for temperature, gyroscope and accelerometer
-`define ACCEL_MSR          10'h008 // accelerometer measurements
-`define TMP_MSR            10'h009 // measurement temperature
-`define GYRO_MSR           10'h00A // gyroscope measurements
-`define USER_CTRL_EN_FIFO  10'h16C
-`define USER_CTRL_DIS_FIFO 10'h1AC
-`define FIFO_COUNT         10'h00E
-`define CHECK              10'h00F // check WHO_AM_I
-    
+`include "define.vh"
     
 `timescale 10 ns/ 1 ns
 module tb_mpu_6050;
@@ -143,7 +131,7 @@ module tb_mpu_6050;
       I_EN = 1'b1;
 //    reading accelerometer
       I_INSTR = `ACCEL_MSR;
-      #2313; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK from the slave that received the command  
+      #2313; en_sda_slv = 1'b1; sda_slv = 1'b0; // ACK command
       #250; en_sda_slv = 1'b0; sda_slv = 1'b1;
       ack_data(1);
       ack_comm;
