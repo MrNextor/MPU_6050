@@ -26,7 +26,7 @@ Register map:
 1. 4.4 Register 27 (8'h1B) – Gyroscope Configuration (GYRO_CONFIG);
 2. 4.5 Register 28 (8'h1C) – Accelerometer Configuration (ACCEL_CONFIG)
 
-Implemented 4 configurations:
+Implemented 6 configurations:
 1. ***I_INSTR: 10'h022***.  
     Full Scale Range: gyroscope - ± 250 °/s, accelerometer - ± 2g.  
     Signals instruction_memory.v:
@@ -63,6 +63,24 @@ Implemented 4 configurations:
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_18 (16'b110_1000_0_0001_1000)*;
         - O_DATA_ROM_B: *16'h1B_20 (16'b0001_1011_0010_0000)*.
+5. ***I_INSTR: 10'h232***   
+    Self test accelerometer.
+    Signals instruction_memory.v:
+    - Input signals:
+        - I_ADDR_ROM_A: *5'h11*;
+        - I_ADDR_ROM_B: *5'h12*.
+    - Output signals:
+        - O_DATA_ROM_A: *16'hD0_E0 (16'b110_1000_0_1110_0000)*;
+        - O_DATA_ROM_B: *16'h1B_10 (16'b0001_1011_0001_0000)*.
+6. ***I_INSTR: 10'h274***   
+    Self test gyroscope.
+    Signals instruction_memory.v:
+    - Input signals:
+        - I_ADDR_ROM_A: *5'h13*;
+        - I_ADDR_ROM_B: *5'h14*.
+    - Output signals:
+        - O_DATA_ROM_A: *16'hD0_F0 (16'b110_1000_0_1111_0000)*;
+        - O_DATA_ROM_B: *16'h1C_10 (16'b0001_1100_0001_0000)*.
 #### FIFO Enable
 W type : ***I_INSTR: 10'h0C7***  
 Register map: 4.6 Register 35 (8'h23) – FIFO Enable (FIFO_EN)  
@@ -159,3 +177,13 @@ Signals instruction_memory.v:
 - Output signals:
     - O_DATA_ROM_A: *16'hD1_00 (16'b110_1000_1_0000_0000)*;
     - O_DATA_ROM_B: *16'h75_10 (16'b0111_0101_0001_0000)*.
+#### Self Test Registers
+R type: ***I_INSTR: 10'h010***    
+Register map: 4.1 Registers 13 to 16 (8'h0D to 8'h10) – Self Test Registers (SELF_TEST_X, SELF_TEST_Y, SELF_TEST_Z, and SELF_TEST_A)  
+Signals instruction_memory.v:
+- Input signals:
+    - I_ADDR_ROM_A: *5'h0*;
+    - I_ADDR_ROM_B: *5'h10*.
+- Output signals:
+    - O_DATA_ROM_A: *16'hD1_00 (16'b110_1000_1_0000_0000)*;
+    - O_DATA_ROM_B: *16'h0D_40 (16'b0000_1101_0100_0000)*. 

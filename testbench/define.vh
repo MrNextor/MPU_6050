@@ -10,3 +10,6 @@
 `define USER_CTRL_DIS_FIFO 10'h1AC // user control: disable FIFO
 `define FIFO_COUNT         10'h00E // read FIFO count
 `define CHECK              10'h00F // check WHO_AM_I
+`define SELF_TEST          10'h010 // read coefficients
+`define G_CONF             10'h232
+`define A_CONF             10'h274

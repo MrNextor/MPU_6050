@@ -137,8 +137,8 @@ module tb_mpu_6050;
       ack_comm;
       repeat (3)
         begin
-          slv_tr_byte(8'hF0);
-          slv_tr_byte(8'hB0); // -3920     
+          slv_tx(8'hF0);
+          slv_tx(8'hB0); // -3920     
         end  
 
 //    G_A_CONF_0
@@ -171,8 +171,8 @@ module tb_mpu_6050;
       ack_comm;
       ack_data(1);
       ack_comm;
-      slv_tr_byte(8'hF0);
-      slv_tr_byte(8'hB0); // -3920  
+      slv_tx(8'hF0);
+      slv_tx(8'hB0); // -3920  
 
 //    reading gyroscope
       I_INSTR = `GYRO_MSR;
@@ -181,8 +181,8 @@ module tb_mpu_6050;
       ack_comm;      
       repeat (3)
         begin
-          slv_tr_byte(8'hF0);
-          slv_tr_byte(8'hB0); // -3920     
+          slv_tx(8'hF0);
+          slv_tx(8'hB0); // -3920     
         end 
 
 //    User Control
@@ -200,22 +200,42 @@ module tb_mpu_6050;
       ack_comm;
       ack_data(1);
       ack_comm;
-      slv_tr_byte(8'hF0);
-      slv_tr_byte(8'hB0); // -3920   
+      slv_tx(8'hF0);
+      slv_tx(8'hB0); // -3920   
 
 //    communication check (1)
       I_INSTR = `CHECK; 
       ack_comm;
       ack_data(1);
       ack_comm;
-      slv_tr_byte(8'h68);
+      slv_tx(8'h68);
       
 //    communication check (2)
       I_INSTR = `CHECK; 
       ack_comm;
       ack_data(1);
       ack_comm;
-      slv_tr_byte(8'h69);      
+      slv_tx(8'h69);   
+      
+//    read SELF TEST registers     
+      I_INSTR = `SELF_TEST;
+      ack_comm;
+      ack_data(1);
+      ack_comm;
+      slv_tx(8'h88);
+      slv_tx(8'h99);
+      slv_tx(8'hAA);
+      slv_tx(8'hBB);
+      
+//   G_CONF
+     I_INSTR = `G_CONF;
+     ack_comm;
+     ack_data(2);
+     
+//   A_CONF
+     I_INSTR = `A_CONF;
+     ack_comm;
+     ack_data(2);     
 
 //    waiting for instructions      
       I_EN = 1'b0;
@@ -252,7 +272,7 @@ module tb_mpu_6050;
     endtask
 
 // --------------------------------------------------------------------------        
-    task automatic slv_tr_byte; 
+    task automatic slv_tx; 
       input [7:0] data;
       begin    
           en_sda_slv = 1'b1;
