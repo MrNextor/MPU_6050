@@ -186,4 +186,4 @@ Signals instruction_memory.v:
     - I_ADDR_ROM_B: *5'h10*.
 - Output signals:
     - O_DATA_ROM_A: *16'hD1_00 (16'b110_1000_1_0000_0000)*;
-    - O_DATA_ROM_B: *16'h0D_40 (16'b0000_1101_0100_0000)*. 
+    - O_DATA_ROM_B: *16'h0D_40 (16'b0000_1101_0100_0000)*.
