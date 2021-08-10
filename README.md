@@ -21,11 +21,12 @@ Description O_DATA_ROM_B:
 ### Implemented instructions
 
 #### Reset MPU_6050
-Register map: 4.28 Register 107 (8'h6B) – Power Management 1 (PWR_MGMT_1)
+Register map: 4.28 Register 107 (8'h6B) – Power Management 1 (PWR_MGMT_1)  
 Setting PWR_MGMT_1:
-- DEVICE_RESET[7], SLEEP[6], CYCLE[5], bit[4], TEMP_DIS[3]: set 0;
-- CLKSEL[2:0]: set 1.  
-W type: ***I_INSTR: 10'h001***   
+- *DEVICE_RESET[7], SLEEP[6], CYCLE[5], bit[4], TEMP_DIS[3]*: set 0;
+- *CLKSEL[2:0]*: set 1.
+
+W type: ***I_INSTR: 10'h001***  
 Signals instruction_memory.v:
 - Input signals:
     - I_ADDR_ROM_A: *5'h0*;
@@ -38,6 +39,7 @@ Signals instruction_memory.v:
 Register map:
 1. 4.4 Register 27 (8'h1B) – Gyroscope Configuration (GYRO_CONFIG);
 2. 4.5 Register 28 (8'h1C) – Accelerometer Configuration (ACCEL_CONFIG)
+
 W type.  
 Implemented 6 configurations:
 1. ***I_INSTR: 10'h043***   
@@ -114,7 +116,8 @@ Setting USER_CTRL:
 - *SIG_COND_RESET[0]*: set 1;
 - *bits [7], [3]*: not user.
 W type.  
-1. ***I_INSTR: 10'h1AE*** Enables FIFO operations.  
+1. ***I_INSTR: 10'h1AE***
+    Enables FIFO operations.  
     Signals instruction_memory.v:
     - Input signals:
         - I_ADDR_ROM_A: *5'hD*;
@@ -122,7 +125,8 @@ W type.
     - Output signals:
         - O_DATA_ROM_A: *16'hD0_41 (16'b110_1000_0_0100_0001)*;
         - O_DATA_ROM_B: *16'h6A_10 (16'b0110_1010_0001_0000)*.
-2. ***I_INSTR: 10'h1EE*** Disable FIFO operations.  
+2. ***I_INSTR: 10'h1EE*** 
+    Disable FIFO operations.  
     Signals instruction_memory.v:
     - Input signals:
         - I_ADDR_ROM_A: *5'hF*;
@@ -139,7 +143,8 @@ Setting FIFO_EN:
 - *YG_FIFO_EN[5]*: set 1;
 - *ZG_FIFO_EN[4]*: set 1;
 - *ACCEL_FIFO_EN[3]*: set 1;
-- *bits[2:0]*: set 0.  
+- *bits[2:0]*: set 0.
+
 W type : ***I_INSTR: 10'h211***  
 Signals instruction_memory.v:
 - Input signals:
