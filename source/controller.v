@@ -141,6 +141,7 @@ module controller
                              if (&(!cnt_fl_i_busy))                       // when = 0
                                begin
                                  nx_o_fl[0] = 1'b0;                       // finish state of reading
+                                 nx_o_busy  = 1'b0;
                                  nx_st = IDLE;
                                end
                            end
@@ -160,6 +161,7 @@ module controller
                              if (&(!cnt_fl_i_busy))                       // when = 0
                                begin
                                  nx_o_fl[1] = 1'b0;                       // finish state of writing
+                                 nx_o_busy  = 1'b0;
                                  nx_st = IDLE;
                                end
                            end                        

@@ -14,7 +14,7 @@
 
 # Quartus Prime: Generate Tcl File for Project
 # File: db_mpu_6050.tcl
-# Generated on: Sat Aug 07 17:14:16 2021
+# Generated on: Tue Aug 10 16:35:59 2021
 
 # Load Quartus Prime Tcl Project package
 package require ::quartus::project
@@ -63,9 +63,6 @@ if {$make_assignments} {
 	set_global_assignment -name EDA_TEST_BENCH_FILE testbench/tb_mpu_6050.v -section_id tb_mpu_6050
 	set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
 	set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
-	set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-	set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-	set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 	set_global_assignment -name VERILOG_FILE source/db_mpu_6050.v
 	set_global_assignment -name VERILOG_FILE source/top_mpu_6050.v
 	set_global_assignment -name VERILOG_FILE source/controller.v
@@ -74,6 +71,9 @@ if {$make_assignments} {
 	set_global_assignment -name VERILOG_FILE source/i2c_fsm.v
 	set_global_assignment -name VERILOG_FILE source/i2c_clk_div.v
 	set_global_assignment -name SDC_FILE source/db_mpu_6050.sdc
+	set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+	set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+	set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 	set_location_assignment PIN_V16 -to O_LEDR[0]
 	set_location_assignment PIN_W16 -to O_LEDR[1]
 	set_location_assignment PIN_V17 -to O_LEDR[2]
@@ -97,6 +97,7 @@ if {$make_assignments} {
 	set_location_assignment PIN_AA15 -to I_KEY[1]
 	set_location_assignment PIN_AA20 -to IO_SCL
 	set_location_assignment PIN_AC22 -to IO_SDA
+	set_location_assignment PIN_AF14 -to CLK
 	set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to O_LEDR[9]
 	set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to O_LEDR[8]
 	set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to O_LEDR[7]
@@ -121,7 +122,10 @@ if {$make_assignments} {
 	set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to IO_SDA
 	set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to IO_SCL
 	set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLK
-	set_location_assignment PIN_AF14 -to CLK
+	set_location_assignment PIN_W15 -to I_KEY[2]
+	set_location_assignment PIN_AE12 -to I_SW[9]
+	set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to I_SW[9]
+	set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to I_KEY[2]
 	set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 
 	# Commit assignments

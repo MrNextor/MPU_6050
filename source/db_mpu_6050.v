@@ -10,8 +10,8 @@ module db_mpu_6050
     localparam RXD_SZ = 24; // buffer of received data from MPU_6050 (width)
 //  input signals
     input wire       CLK;   // clock 50 MHz
-    input wire [1:0] I_KEY; 
-    input wire [8:0] I_SW;
+    input wire [2:0] I_KEY; 
+    input wire [9:0] I_SW;
 //  output signals
     output reg [9:0] O_LEDR;
 //  inout signals
@@ -34,7 +34,7 @@ module db_mpu_6050
          .CLK(CLK), 
          .RST_n(RST_n),
          .I_EN(~I_KEY[0]),
-         .I_INSTR(I_SW[8:1]), 
+         .I_INSTR(I_SW[9:0]), 
          .O_ACK_FL(ack),
          .O_CNT_RS_ACK_FL(),
          .O_ERR(err),
@@ -47,15 +47,13 @@ module db_mpu_6050
         );
 
 //--------------------------------------------------------------------------
-    assign RST_n = I_KEY[1];
+    assign RST_n = I_KEY[2];
     always @(posedge CLK or negedge RST_n) begin
       if (!RST_n) 
-        begin
           O_LEDR[9:0] <= 10'b0;
-        end
       else
         begin
-          if (!I_SW[0])
+          if (I_KEY[1])
             O_LEDR[9:0] <= {err, ack, rxd_buff[15:8]};
           else 
             O_LEDR[9:0] <= {err, ack, rxd_buff[7:0]};

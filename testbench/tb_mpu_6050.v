@@ -2,26 +2,24 @@
     
 `timescale 10 ns/ 1 ns
 module tb_mpu_6050;
-    parameter FPGA_CLK             = 50_000_000; // FPGA frequency 50 MHz
-    parameter I2C_CLK              = 400_000;    // I2C bus frequency 400 KHz     
-    parameter ADDR_I2C_SZ          = 7;          // addr on I2C bus width
-    parameter DATA_I2C_SZ          = 8;          // data on I2C bus width 
-    parameter DATA_ROM_SZ          = 16;         // word width in ROM    
-    parameter ADDR_ROM_SZ          = 5;          // addr width in ROM 
-    parameter FL_SZ                = 2;          // command execution flag width
+    parameter FPGA_CLK    = 50_000_000; // FPGA frequency 50 MHz
+    parameter I2C_CLK     = 400_000;    // I2C bus frequency 400 KHz     
+    parameter ADDR_I2C_SZ = 7;          // addr on I2C bus width
+    parameter DATA_I2C_SZ = 8;          // data on I2C bus width 
+    parameter DATA_ROM_SZ = 16;         // word width in ROM    
+    parameter ADDR_ROM_SZ = 5;          // addr width in ROM 
+    parameter FL_SZ       = 2;          // command execution flag width
 /*
-    parameter ADDR_OPM_SZ          = 4;          // addr width in RAM 
-    parameter DATA_OPM_SZ          = 16;         // word width in RAM
-    parameter DATA_ALU             = 32;         // data ALU width
-    parameter DATA_DIV             = 33;         // data div width 
+    parameter ADDR_OPM_SZ = 4;          // addr width in RAM 
+    parameter DATA_OPM_SZ = 16;         // word width in RAM
+    parameter DATA_ALU    = 32;         // data ALU width
+    parameter DATA_DIV    = 33;         // data div width 
 */    
 // --------------------------------------------------------------------------     
     reg                     CLK;             // clock 50 MHz
     reg                     RST_n;           // asynchronous reset_n
     reg                     I_EN;            // enable Controller
     reg [ADDR_ROM_SZ*2-1:0] I_INSTR;         // command for MPU_6050  
-    wire [DATA_ROM_SZ-1:0]  data_rom_a;      // word A in ROM
-    wire [DATA_ROM_SZ-1:0]  data_rom_b;      // word B in ROM    
     wire [ADDR_ROM_SZ-1:0]  addr_rom_a_out;  // word A addr in ROM
     wire [ADDR_ROM_SZ-1:0]  addr_rom_b_out;  // word B addr in ROM  
     wire                    en_i2c;          // enable I2C bus  
@@ -57,10 +55,10 @@ module tb_mpu_6050;
 */    
     wire [FL_SZ-1:0]        O_FL;            // instruction execution flag 
     wire                    O_BUSY;          // Busy controller
-    wire                    O_ERR;           // error state of FSM
-    wire [4:0]              O_CNT_RS_ERR;    // counter error state of FSM 
     wire                    O_ACK_FL;        // flag in case of error on the bus   
     wire [4:0]              O_CNT_RS_ACK_FL; // counter error ACK from MPU_6050
+    wire                    O_ERR;           // error state of FSM
+    wire [4:0]              O_CNT_RS_ERR;    // counter error state of FSM 
     reg                     en_sda_slv;      // enable signal to simulate sda from the slave
     reg                     sda_slv;         // sda from the slave
     integer                 k;  
@@ -92,8 +90,6 @@ module tb_mpu_6050;
     assign en_i2c = dut.en_i2c;
     assign addr_rom_a_out = dut.addr_rom_a_out;
     assign addr_rom_b_out = dut.addr_rom_b_out;
-    assign data_rom_a = dut.data_rom_a;
-    assign data_rom_b = dut.data_rom_b;    
     assign rxd_buff = dut.rxd_buff;
 /*    
     assign num = dut.num;
@@ -141,6 +137,21 @@ module tb_mpu_6050;
           slv_tx(8'hB0); // -3920     
         end  
 
+//    Reset
+      I_INSTR = `RESET;
+      ack_comm;
+      ack_data(2);
+     
+//    G_CONF
+      I_INSTR = `G_CONF;
+      ack_comm;
+      ack_data(2);
+     
+//    A_CONF
+      I_INSTR = `A_CONF;
+      ack_comm;
+      ack_data(2);     
+     
 //    G_A_CONF_0
       I_INSTR = `G_A_CONF_0;
       ack_comm;
@@ -159,12 +170,27 @@ module tb_mpu_6050;
 //    G_A_CONF_3
       I_INSTR = `G_A_CONF_3;
       ack_comm;
-      ack_data(3);
+      ack_data(3); 
+
+//    SMPRT_DIV
+      I_INSTR = `SMPRT_DIV;
+      ack_comm;
+      ack_data(2);
+
+//    User Control FIFO enable
+      I_INSTR = `USER_CTRL_EN_FIFO;
+      ack_comm;
+      ack_data(2);
+
+//    User Control FIFO Disable
+      I_INSTR = `USER_CTRL_DIS_FIFO;
+      ack_comm;
+      ack_data(2); 
 
 //    FIFO Enable
       I_INSTR = `FIFO_EN;
       ack_comm;
-      ack_data(2);
+      ack_data(2);    
 
 //    reading of temperature
       I_INSTR = `TMP_MSR;
@@ -183,25 +209,25 @@ module tb_mpu_6050;
         begin
           slv_tx(8'hF0);
           slv_tx(8'hB0); // -3920     
-        end 
-
-//    User Control
-      I_INSTR = `USER_CTRL_EN_FIFO;
-      ack_comm;
-      ack_data(2);
-
-//    FIFO Disable
-      I_INSTR = `USER_CTRL_DIS_FIFO;
-      ack_comm;
-      ack_data(2);
-
+        end       
+        
 //    reading FIFO Count Registers
       I_INSTR = `FIFO_COUNT;
       ack_comm;
       ack_data(1);
       ack_comm;
       slv_tx(8'hF0);
-      slv_tx(8'hB0); // -3920   
+      slv_tx(8'hB0); // -3920      
+
+//    read SELF TEST registers     
+      I_INSTR = `SELF_TEST;
+      ack_comm;
+      ack_data(1);
+      ack_comm;
+      slv_tx(8'h88);
+      slv_tx(8'h99);
+      slv_tx(8'hAA);
+      slv_tx(8'hBB);
 
 //    communication check (1)
       I_INSTR = `CHECK; 
@@ -215,27 +241,7 @@ module tb_mpu_6050;
       ack_comm;
       ack_data(1);
       ack_comm;
-      slv_tx(8'h69);   
-      
-//    read SELF TEST registers     
-      I_INSTR = `SELF_TEST;
-      ack_comm;
-      ack_data(1);
-      ack_comm;
-      slv_tx(8'h88);
-      slv_tx(8'h99);
-      slv_tx(8'hAA);
-      slv_tx(8'hBB);
-      
-//   G_CONF
-     I_INSTR = `G_CONF;
-     ack_comm;
-     ack_data(2);
-     
-//   A_CONF
-     I_INSTR = `A_CONF;
-     ack_comm;
-     ack_data(2);     
+      slv_tx(8'h69);      
 
 //    waiting for instructions      
       I_EN = 1'b0;
@@ -248,7 +254,7 @@ module tb_mpu_6050;
 // -------------------------------------------------------------------------- 
     initial begin
       // $dumpvars;
-      #152000 $finish;
+      #200000 $finish;
     end
 
 // --------------------------------------------------------------------------     
